@@ -2,10 +2,9 @@
  * MusicユースケースはMusicのビジネスロジック
  */
 
-class MusicUsecase {
+export default class MusicUsecase {
     constructor(music) {
         this.music = music;
     }
 
-    
 }

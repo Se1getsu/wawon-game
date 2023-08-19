@@ -2,7 +2,7 @@
  * Musicドメインは曲の情報を保持する
  */
 
-class Music {
+export default class Music {
     get Chart() {
         return this.chart;
     }

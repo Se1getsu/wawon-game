@@ -2,7 +2,7 @@
  * Chartドメインは譜面の情報を保持する
  */
 
-class Chart {
+export default class Chart {
     get Notes() {
         return this.notes;
     }

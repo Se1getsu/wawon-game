@@ -2,12 +2,12 @@
  * LocalJsonReaderクラスはローカルのJSONファイルを読み込む。
  */
 
-class LocalJsonReader {
+export default class LocalJsonReader {
     async load(path) {
         const response = await fetch(path);
         if (!response.ok) {
             throw new Error("Failed to fetch: ${path}");
         }
-        return response.json;
+        return response.json();
     }
 }
