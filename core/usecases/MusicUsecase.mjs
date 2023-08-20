@@ -17,4 +17,12 @@ export default class MusicUsecase {
     setChartByJson(json) {
         this.chartUseCase.setByJson(json);
     }
+
+    getTitle() {
+        return this.music.title
+    }
+
+    getAudioFile() {
+        return this.music.file
+    }
 }
