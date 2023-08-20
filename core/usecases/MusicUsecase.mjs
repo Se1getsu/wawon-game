@@ -9,9 +9,12 @@ export default class MusicUsecase {
         chartUseCase.music = music;
     }
 
-    setByJson(json) {
+    setMusicByJson(json) {
         this.music.title = json.title;
         this.music.file = json.file;
+    }
+
+    setChartByJson(json) {
         this.chartUseCase.setByJson(json);
     }
 }
