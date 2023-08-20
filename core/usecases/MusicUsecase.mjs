@@ -25,4 +25,8 @@ export default class MusicUsecase {
     getAudioFile() {
         return this.music.file
     }
+
+    getChartUsecase() {
+        return this.chartUseCase
+    }
 }
