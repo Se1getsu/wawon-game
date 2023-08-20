@@ -7,11 +7,13 @@ export default class MusicListUsecase {
         this.musics = musics
     }
 
-    setMusicByJson(json) {
-        this.musics = json;
+    setMusicListByJson(json) {
+        json.forEach((musicJson, index) => {
+            this.musics[index].setMusicByJson(musicJson)
+        });
     }
 
-    getMusicByIndex(index) {
+    getMusicUsecaseByIndex(index) {
         return this.musics[index];
     }
 
