@@ -8,8 +8,8 @@ export default class ChartUsecase {
     }
 
     setByJSON(json) {
-        this.chart.bpm = json.bpm;
-        this.notes = json.notes;
+        this.chart.Bpm = json.bpm;
+        this.chart.Notes = json.notes;
     }
 
     setNotesByString(str) {
@@ -18,14 +18,14 @@ export default class ChartUsecase {
     }
 
     getBpm() {
-        return bpm
+        return this.chart.Bpm
     }
 
     getNotes(startpoint, endpoint) {
-        return this.notes.slice(startpoint, endpoint)
+        return this.chart.Notes.slice(startpoint, endpoint)
     }
 
     getChartLength() {
-        return this.notes.length;
+        return this.chart.Notes.length;
     }
 }
