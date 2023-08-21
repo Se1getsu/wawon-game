@@ -3,8 +3,9 @@
  */
 
 export default class GameUsecase {
-    constructor(game) {
+    constructor(notesLength, game) {
         this.game = game;
+        this.isNotesShown = Array(notesLength).fill(true);
     }
 
     setBpm(bpm) {
@@ -27,11 +28,21 @@ export default class GameUsecase {
         return this.game.CurrentScore;
     }
 
-    nextFrame() {
+    nextFrame(chord) {
         let currentFrame = this.game.CurrentFrame;
         currentFrame++;
         this.game.CurrentFrame = currentFrame;
-        // TODO: 判定幅を過ぎたノーツのMISS判定を出す。
+
+        _judgeChord(chord)
+        _judgePassedNotes()
+    }
+
+    _judgeChord(chord) {
+        // TODO: 実装
+    }
+
+    _judgePassedNotes() {
+        // TODO: 実装
     }
 
     _getCurrentBeatTime(bpm) {
