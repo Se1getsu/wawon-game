@@ -9,12 +9,23 @@ export default class ChartUsecase {
 
     setByJson(json) {
         this.chart.Bpm = json.bpm;
-        this.chart.Notes = json.notes;
+        this.setNotesByString(json.notes);
     }
 
     setNotesByString(str) {
-        // TODO: 実装
-        return str
+        str = str.replace(/ /g, '');
+        const parts = str.split('|');
+        const notes = [];
+        
+        for (let i = 0; i < parts.length; i++) {
+            const subparts = parts[i].split(',');
+        
+            for (let j = 0; j < subparts.length; j++) {
+                notes.push([subparts[j], j === 0]);
+            }
+        }
+        
+        this.chart.Notes = notes;
     }
 
     getBpm() {
