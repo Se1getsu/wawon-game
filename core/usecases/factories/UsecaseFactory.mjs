@@ -1,5 +1,6 @@
 import DomainFactory from "../../domains/models/factories/DomainFactory.mjs";
 import ChartUsecase from "../ChartUsecase.mjs";
+import GameUsecase from "../GameUsecase.mjs";
 import MusicListUsecase from "../MusicListUsecase.mjs";
 import MusicUsecase from "../MusicUsecase.mjs";
 
@@ -11,6 +12,12 @@ export default class UsecaseFactory {
     createChartUsecase() {
         return new ChartUsecase(
             this.domainFactory.createChart()
+        )
+    }
+
+    createGametUsecase() {
+        return new GameUsecase(
+            this.domainFactory.createGame()
         )
     }
 

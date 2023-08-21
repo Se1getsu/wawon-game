@@ -1,5 +1,6 @@
 import Chart from "../Chart.mjs";
 import Music from "../Music.mjs";
+import Game from "../Game.mjs";
 
 export default class DomainFactory {
     constructor() {}
@@ -10,5 +11,9 @@ export default class DomainFactory {
 
     createMusic() {
         return new Music()
+    }
+
+    createGame() {
+        return new Game()
     }
 }
