@@ -7,7 +7,7 @@ export default class ChartUsecase {
         this.chart = chart;
     }
 
-    setByJSON(json) {
+    setByJson(json) {
         this.chart.Bpm = json.bpm;
         this.chart.Notes = json.notes;
     }
