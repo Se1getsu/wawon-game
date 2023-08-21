@@ -13,7 +13,7 @@ export default class GameUsecase {
     }
 
     getBpm() {
-        return this.game.Bpm;
+        return this.bpm;
     }
 
     setFps(fps) {
@@ -45,7 +45,7 @@ export default class GameUsecase {
         // TODO: 実装
     }
 
-    _getCurrentBeatTime(bpm) {
-        return (this.game.CurrentFrame * bpm) / (fps * 60);
+    _getCurrentBeatTime() {
+        return this.game.CurrentFrame * this.game.Fps * 60 / this.bpm;
     }
 }
