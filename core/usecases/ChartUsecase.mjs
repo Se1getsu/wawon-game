@@ -21,7 +21,10 @@ export default class ChartUsecase {
             const subparts = parts[i].split(',');
         
             for (let j = 0; j < subparts.length; j++) {
-                notes.push([subparts[j], j === 0]);
+                notes.push({
+                    chord: subparts[j],
+                    isHeadOfMeasure: j === 0
+                });
             }
         }
         
