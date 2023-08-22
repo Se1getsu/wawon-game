@@ -45,6 +45,43 @@ export default class GameUsecase {
         return _judgeChord([...inputChords])
     }
 
+    getNotesWithin(startTime, endTime) {
+        let bps = this.bpm / 60;
+        let startBeatTime = Math.ceil(startTime * bps);
+        let endBeatTime   = Math.ceil(endTime   * bps);
+
+        let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
+        let result = []
+        notes.forEach(({chord}, i) => {
+            if (chord) {
+                result.push({
+                    timing: (startBeatTime + i) / bps,
+                    chord: chord
+                });
+            }
+        });
+
+        return result;
+    }
+
+    getBarLineWithin(startTime, endTime) {
+        let bps = this.bpm / 60;
+        let startBeatTime = Math.ceil(startTime * bps);
+        let endBeatTime   = Math.ceil(endTime   * bps);
+
+        let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
+        let result = []
+        notes.forEach(({isHeadOfMeasure}, i) => {
+            if (isHeadOfMeasure) {
+                result.push({
+                    timing: (startBeatTime + i) / bps
+                });
+            }
+        });
+
+        return result;
+    }
+
     _judgeChord(inputChords) {
         let range = this.judgeRule.judgeFrameRange();
         let maxBeatTime = Math.floor((currentFrame + range.max) * this.getBpf());
