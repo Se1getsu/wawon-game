@@ -9,7 +9,7 @@ export default class JudgeRule {
         return note == chord
     }
 
-    judgeRange() {
+    judgeFrameRange() {
         return {
             min: -7.5,
             max: 7.5
