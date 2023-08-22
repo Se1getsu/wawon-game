@@ -45,10 +45,10 @@ function keyDownHandler(e){
 //画像の変数
 //タイトル
 var imgTitleLogo = new Image();
-imgTitleLogo.src = './img/titleLogo.png';
+imgTitleLogo.src = './resources/img/titleLogo.png';
 var TitleLogo = false;
 var imgTitleEnter = new Image();
-imgTitleEnter.src = './img/titleEnter.png';
+imgTitleEnter.src = './resources/img/titleEnter.png';
 var TitleEnter = false;
 imgTitleLogo.onload = function(){
     TitleLogo = true;
@@ -60,9 +60,9 @@ imgTitleEnter.onload = function(){
 var imgMusicone = new Image();
 var imgMusictwo = new Image();
 var imgMusicthree = new Image();
-imgMusicone.src = './img/music1.png';
-imgMusictwo.src = './img/music2.png';
-imgMusicthree.src = './img/music3.png';
+imgMusicone.src = './resources/img/music1.png';
+imgMusictwo.src = './resources/img/music2.png';
+imgMusicthree.src = './resources/img/music3.png';
 var Musicone = false;
 var Musictwo = false;
 var Musicthree = false;
