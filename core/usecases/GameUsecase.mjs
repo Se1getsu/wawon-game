@@ -33,7 +33,7 @@ export default class GameUsecase {
         return this.bpm / (this.game.Fps * 60);
     }
 
-    getCurrentScore(score) {
+    getCurrentScore() {
         return this.game.CurrentScore;
     }
 
