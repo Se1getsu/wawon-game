@@ -16,7 +16,7 @@ export default class Music {
     }
 
     set Title(title) {
-        this.bpm = title;
+        this.title = title;
     }
 
     get AudioFilePath() {

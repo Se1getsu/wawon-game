@@ -1,6 +1,6 @@
 import LocalJsonReader from "../LocalJsonReader.mjs";
 
-export default class AdapterFactory {
+export default class InfrastructureFactory {
     constructor() {}
 
     createLocalJsonReader() {

@@ -7,21 +7,43 @@ export default class ChartUsecase {
         this.chart = chart;
     }
 
-    setByJSON(json) {
+    setByJson(json) {
         this.chart.Bpm = json.bpm;
-        this.chart.Notes = json.notes;
+        this.setNotesByString(json.notes);
     }
 
     setNotesByString(str) {
-        // TODO: 実装
-        return str
+        str = str.replace(/ /g, '');
+        const parts = str.split('|');
+        const notes = [];
+        
+        for (let i = 0; i < parts.length; i++) {
+            const subparts = parts[i].split(',');
+        
+            for (let j = 0; j < subparts.length; j++) {
+                notes.push({
+                    chord: subparts[j],
+                    isHeadOfMeasure: j === 0
+                });
+            }
+        }
+        
+        this.chart.Notes = notes;
     }
 
     getBpm() {
         return this.chart.Bpm
     }
 
-    getNotes(startpoint, endpoint) {
+    getNotes() {
+        return this.chart.Notes
+    }
+
+    getNoteOfIndex(index) {
+        return this.chart.Notes[index];
+    }
+
+    getNotesInRange(startpoint, endpoint) {
         return this.chart.Notes.slice(startpoint, endpoint)
     }
 
