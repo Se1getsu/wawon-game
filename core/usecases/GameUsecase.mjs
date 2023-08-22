@@ -3,8 +3,9 @@
  */
 
 export default class GameUsecase {
-    constructor(notesLength, game) {
+    constructor(notesLength, game, judgeRule) {
         this.game = game;
+        this.judgeRule = judgeRule;
         this.isNotesShown = Array(notesLength).fill(true);
     }
 
@@ -22,6 +23,10 @@ export default class GameUsecase {
 
     getFps() {
         return this.game.Fps;
+    }
+
+    getBpf() {
+        return this.bpm / (this.game.Fps * 60);
     }
 
     getCurrentScore(score) {
@@ -42,10 +47,11 @@ export default class GameUsecase {
     }
 
     _judgePassedNotes() {
-        // TODO: 実装
+        let minFrame = this.judgeRule.judgeRange().min;
+        let minBeatTime = minFrame * this.getBpf();
     }
 
     _getCurrentBeatTime() {
-        return this.game.CurrentFrame * this.game.Fps * 60 / this.bpm;
+        return this.game.CurrentFrame * this.getBpf();
     }
 }

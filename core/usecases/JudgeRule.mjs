@@ -9,6 +9,13 @@ export default class JudgeRule {
         return note == chord
     }
 
+    judgeRange() {
+        return {
+            min: -7.5,
+            max: 7.5
+        };
+    }
+
     judgeTiming(noteBeatTime, currentFrame, fps, bpm) {
         let noteFrame = noteBeatTime * fps * 60 / bpm;
         let delta = noteFrame - (currentFrame - 0.5);
