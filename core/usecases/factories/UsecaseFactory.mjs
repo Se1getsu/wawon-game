@@ -16,9 +16,8 @@ export default class UsecaseFactory {
         )
     }
 
-    createGametUsecase(notesLength) {
+    createGametUsecase() {
         return new GameUsecase(
-            notesLength,
             this.domainFactory.createGame(),
             this.createJudgeRule()
         )

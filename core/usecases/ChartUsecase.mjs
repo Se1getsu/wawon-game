@@ -35,7 +35,15 @@ export default class ChartUsecase {
         return this.chart.Bpm
     }
 
-    getNotes(startpoint, endpoint) {
+    getNotes() {
+        return this.chart.Notes
+    }
+
+    getNoteOfIndex(index) {
+        return this.chart.Notes[index];
+    }
+
+    getNotesInRange(startpoint, endpoint) {
         return this.chart.Notes.slice(startpoint, endpoint)
     }
 

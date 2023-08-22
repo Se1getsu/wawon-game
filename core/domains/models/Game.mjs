@@ -7,6 +7,13 @@ export default class Game {
         this.fps = 60;
         this.currentScore = 0;
         this.currentFrame = 0;
+        this.judges = {
+            just:   0,
+            great:  0,
+            good:   0,
+            bad:    0,
+            miss:   0
+        }
     }
 
     increaseScore(score) {
@@ -23,5 +30,13 @@ export default class Game {
 
     set CurrentFrame(currentFrame) {
         this.currentFrame = currentFrame;
+    }
+
+    incrementJudge(judge) {
+        this.judges[judge]++;
+    }
+
+    getJudgeCountOf(judge) {
+        return this.judges[judge];
     }
 }
