@@ -1,7 +1,7 @@
 [
     {
-        "title": "猫ふんじゃった",
+        "title": "鉄道唱歌",
         "file": "resources/audios/sample.mp3",
-        "chart": "resources/charts/sample.json"
+        "chart": "resources/charts/tetsudo.json"
     }
 ]
