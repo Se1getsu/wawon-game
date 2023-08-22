@@ -3,9 +3,10 @@
  */
 
 export default class GameUsecase {
-    constructor(game, judgeRule) {
+    constructor(game, judgeRule, scoreCalculator) {
         this.game = game;
         this.judgeRule = judgeRule;
+        this.scoreCalculator = scoreCalculator;
         
         this.passedBeatTime = 0;
     }
@@ -56,7 +57,9 @@ export default class GameUsecase {
             inputChords.forEach((chord, j) => {
                 if (chord && chord === this.chartUsecase.getNoteByIndex(i).chord || passed) {
                     this.game.incrementJudge(judge);
-                    // TODO: スコア計算
+                    this.game.increaseScore(this.scoreCalculator.calcNoteScore(
+                        judge
+                    ));
                     inputChords[j] = '';
                     inputResult[j] = judge;
                     this.isNotesShown[i] = false;

@@ -4,6 +4,7 @@ import GameUsecase from "../GameUsecase.mjs";
 import JudgeRule from "../JudgeRule.mjs";
 import MusicListUsecase from "../MusicListUsecase.mjs";
 import MusicUsecase from "../MusicUsecase.mjs";
+import ScoreCalculator from "../ScoreCalculator.mjs";
 
 export default class UsecaseFactory {
     constructor() {
@@ -19,7 +20,8 @@ export default class UsecaseFactory {
     createGametUsecase() {
         return new GameUsecase(
             this.domainFactory.createGame(),
-            this.createJudgeRule()
+            this.createJudgeRule(),
+            this.createScoreCalculator()
         )
     }
 
@@ -38,5 +40,9 @@ export default class UsecaseFactory {
         return new MusicListUsecase(
             Array.from({ length: length }, () => this.createMusicUsecase())
         )
+    }
+
+    createScoreCalculator() {
+        return new ScoreCalculator()
     }
 }
