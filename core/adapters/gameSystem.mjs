@@ -1,6 +1,6 @@
 // ゲームを描画する領域の取得。2Dモードに設定。
 var canvas = document.getElementById('screen');
-context = canvas.getContext('2d');
+var context = canvas.getContext('2d');
 // 画面の色(最初)
 context.fillStyle = 'green'
 context.fillRect(0, 0, 640, 480);
