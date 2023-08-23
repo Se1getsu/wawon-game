@@ -1,6 +1,8 @@
 h1 {
     color: goldenrod;
     border-bottom: solid 1px yellow;
+    border-image: linear-gradient(to right, yellow, rgb(149, 149, 0));
+    border-image-slice: 1;
 }
 
 body {
@@ -18,4 +20,13 @@ body {
 
 #layout {
     text-align: center;
+}
+
+#screen {
+    margin: 16px;
+    border: 10px solid;
+    border-image: linear-gradient(to right bottom,#5d4e02,#513f00) 1 / 10px;
+    outline: 3px outset #57564b;
+    background: black;
+    box-shadow: 0px 0px 20px #575651;
 }
