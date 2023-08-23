@@ -17,7 +17,7 @@ export default class UsecaseFactory {
         )
     }
 
-    createGametUsecase() {
+    createGameUsecase() {
         return new GameUsecase(
             this.domainFactory.createGame(),
             this.createJudgeRule(),
