@@ -1,4 +1,21 @@
 h1 {
-    color: green;
-    border-bottom: solid 2px green;
+    color: goldenrod;
+    border-bottom: solid 1px yellow;
+}
+
+body {
+    height: 100vh;
+    background-color: #0a0a0a;
+    opacity: 1;
+    background-image: linear-gradient(135deg, #222222 25%, transparent 25%),
+        linear-gradient(225deg, #222222 25%, transparent 25%),
+        linear-gradient(45deg, #222222 25%, transparent 25%),
+        linear-gradient(315deg, #222222 25%, #0a0a0a 25%);
+    background-position: 24px 0, 24px 0, 0 0, 0 0;
+    background-size: 24px 24px;
+    background-repeat: repeat;
+}
+
+#layout {
+    text-align: center;
 }
