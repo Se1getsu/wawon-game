@@ -9,20 +9,45 @@ export default class JudgeRule {
         return note == chord
     }
 
+    judgeFrameRange() {
+        return {
+            min: -7.5,
+            max: 7.5
+        };
+    }
+
     judgeTiming(noteBeatTime, currentFrame, fps, bpm) {
         let noteFrame = noteBeatTime * fps * 60 / bpm;
         let delta = noteFrame - (currentFrame - 0.5);
 
         if (-2.5 < delta && delta <= 2.5) {
-            return "just"
+            return {
+                judge: "just",
+                passed: false
+            };
+
         } else if (-5.0 < delta && delta <= 5.0) {
-            return "great"
+            return {
+                judge: "great",
+                passed: false
+            };
+
         } else if (-6.5 < delta && delta <= 6.5) {
-            return "good"
+            return {
+                judge: "good",
+                passed: false
+            };
+
         } else if (-7.5 < delta && delta <= 7.5) {
-            return "bad"
+            return {
+                judge: "bad",
+                passed: false
+            };
         }
         
-        return "miss"
+        return {
+            judge: "bad",
+            passed: delta <= -7.5
+        };
     }
 }

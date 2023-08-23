@@ -1,7 +1,17 @@
 [
     {
-        "title": "猫ふんじゃった",
-        "file": "resources/audios/sample.mp3",
-        "chart": "resources/charts/sample.json"
+        "title": "鉄道唱歌",
+        "file": "resources/audios/tetsudo.mp3",
+        "chart": "resources/charts/tetsudo.json"
+    },
+    {
+        "title": "うさぎとかめ",
+        "file": "resources/audios/rabbit.mp3",
+        "chart": "resources/charts/rabbit.json"
+    },
+    {
+        "title": "フランス民謡 アマリリス",
+        "file": "resources/audios/france.mp3",
+        "chart": "resources/charts/france.json"
     }
 ]

@@ -10,6 +10,7 @@ export default class ChartUsecase {
     setByJson(json) {
         this.chart.Bpm = json.bpm;
         this.setNotesByString(json.notes);
+        this.setKeyBindByString(json.key);
     }
 
     setNotesByString(str) {
@@ -31,11 +32,33 @@ export default class ChartUsecase {
         this.chart.Notes = notes;
     }
 
+    setKeyBindByString(str) {
+        this.keyBind = {};
+        const pairs = str.split(' ');
+        
+        pairs.forEach(pair => {
+            const [key, chord] = pair.split('=');
+            this.keyBind[key] = chord;
+        });
+    }
+
+    getKeyBind() {
+        return this.keyBind;
+    }
+
     getBpm() {
         return this.chart.Bpm
     }
 
-    getNotes(startpoint, endpoint) {
+    getNotes() {
+        return this.chart.Notes
+    }
+
+    getNoteOfIndex(index) {
+        return this.chart.Notes[index];
+    }
+
+    getNotesInRange(startpoint, endpoint) {
         return this.chart.Notes.slice(startpoint, endpoint)
     }
 

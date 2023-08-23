@@ -1,8 +1,10 @@
 import DomainFactory from "../../domains/models/factories/DomainFactory.mjs";
 import ChartUsecase from "../ChartUsecase.mjs";
 import GameUsecase from "../GameUsecase.mjs";
+import JudgeRule from "../JudgeRule.mjs";
 import MusicListUsecase from "../MusicListUsecase.mjs";
 import MusicUsecase from "../MusicUsecase.mjs";
+import ScoreCalculator from "../ScoreCalculator.mjs";
 
 export default class UsecaseFactory {
     constructor() {
@@ -15,11 +17,16 @@ export default class UsecaseFactory {
         )
     }
 
-    createGametUsecase(notesLength) {
+    createGametUsecase() {
         return new GameUsecase(
-            notesLength,
-            this.domainFactory.createGame()
+            this.domainFactory.createGame(),
+            this.createJudgeRule(),
+            this.createScoreCalculator()
         )
+    }
+
+    createJudgeRule() {
+        return new JudgeRule()
     }
 
     createMusicUsecase() {
@@ -33,5 +40,9 @@ export default class UsecaseFactory {
         return new MusicListUsecase(
             Array.from({ length: length }, () => this.createMusicUsecase())
         )
+    }
+
+    createScoreCalculator() {
+        return new ScoreCalculator()
     }
 }

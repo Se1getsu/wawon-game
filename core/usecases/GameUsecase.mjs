@@ -3,17 +3,22 @@
  */
 
 export default class GameUsecase {
-    constructor(notesLength, game) {
+    constructor(game, judgeRule, scoreCalculator) {
         this.game = game;
-        this.isNotesShown = Array(notesLength).fill(true);
+        this.judgeRule = judgeRule;
+        this.scoreCalculator = scoreCalculator;
+        
+        this.passedBeatTime = 0;
     }
 
-    setBpm(bpm) {
-        this.bpm = bpm;
+    setChartUsecase(chartUsecase) {
+        this.chartUsecase = chartUsecase;
+        let notes = chartUsecase.getNotes();
+        this.isNotesShown = notes.map(note => note != '');
     }
 
     getBpm() {
-        return this.bpm;
+        return this.chartUsecase.getBpm();
     }
 
     setFps(fps) {
@@ -24,28 +29,88 @@ export default class GameUsecase {
         return this.game.Fps;
     }
 
-    getCurrentScore(score) {
+    getBpf() {
+        return this.bpm / (this.game.Fps * 60);
+    }
+
+    getCurrentScore() {
         return this.game.CurrentScore;
     }
 
-    nextFrame(chord) {
+    nextFrame(inputChords) {
         let currentFrame = this.game.CurrentFrame;
         currentFrame++;
         this.game.CurrentFrame = currentFrame;
 
-        _judgeChord(chord)
-        _judgePassedNotes()
+        return _judgeChord([...inputChords])
     }
 
-    _judgeChord(chord) {
-        // TODO: 実装
+    getNotesWithin(startTime, endTime) {
+        let bps = this.bpm / 60;
+        let startBeatTime = Math.ceil(startTime * bps);
+        let endBeatTime   = Math.ceil(endTime   * bps);
+
+        let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
+        let result = []
+        notes.forEach(({chord}, i) => {
+            if (chord) {
+                result.push({
+                    timing: (startBeatTime + i) / bps,
+                    chord: chord
+                });
+            }
+        });
+
+        return result;
     }
 
-    _judgePassedNotes() {
-        // TODO: 実装
+    getBarLineWithin(startTime, endTime) {
+        let bps = this.bpm / 60;
+        let startBeatTime = Math.ceil(startTime * bps);
+        let endBeatTime   = Math.ceil(endTime   * bps);
+
+        let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
+        let result = []
+        notes.forEach(({isHeadOfMeasure}, i) => {
+            if (isHeadOfMeasure) {
+                result.push({
+                    timing: (startBeatTime + i) / bps
+                });
+            }
+        });
+
+        return result;
+    }
+
+    _judgeChord(inputChords) {
+        let range = this.judgeRule.judgeFrameRange();
+        let maxBeatTime = Math.floor((currentFrame + range.max) * this.getBpf());
+        let inputResult = new Array(inputChords.length).fill('miss');
+        
+        for (let i = this.passedBeatTime+1; i < maxBeatTime; i++) {
+            if (!this.isNotesShown[i]) continue;
+            let {judge, passed} = this.judgeRule.judgeTiming(i, this.game.CurrentFrame, this.game.Fps, this.bpm);
+
+            inputChords.forEach((chord, j) => {
+                if (chord && chord === this.chartUsecase.getNoteByIndex(i).chord || passed) {
+                    this.game.incrementJudge(judge);
+                    this.game.increaseScore(this.scoreCalculator.calcNoteScore(
+                        judge
+                    ));
+                    inputChords[j] = '';
+                    inputResult[j] = judge;
+                    this.isNotesShown[i] = false;
+                    return;
+                }
+            })
+
+            if (passed) this.passedBeatTime = i;
+        }
+
+        return inputResult
     }
 
     _getCurrentBeatTime() {
-        return this.game.CurrentFrame * this.game.Fps * 60 / this.bpm;
+        return this.game.CurrentFrame * this.getBpf();
     }
 }
