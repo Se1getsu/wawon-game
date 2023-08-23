@@ -1,8 +1,8 @@
 [
     {
         "title": "鉄道唱歌",
-        "file": "resources/audios/tetsudo.mp3",
-        "chart": "resources/charts/tetsudo.json"
+        "file": "resources/audios/railway.mp3",
+        "chart": "resources/charts/railway.json"
     },
     {
         "title": "うさぎとかめ",
