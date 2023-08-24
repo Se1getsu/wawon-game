@@ -140,8 +140,12 @@ function isPressed(key) {
             return threePressed;
         default:
             let idx = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'ArrowUp', 'ArrowDown'].indexOf(key);
-            return PressedMomentArray[idx];
+            return PressedArray[idx];
     }
+}
+function isMomentPressed(key) {
+    let idx = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'ArrowUp', 'ArrowDown'].indexOf(key);
+    return PressedMomentArray[idx];
 }
 //画像の変数
 //タイトル
@@ -184,10 +188,6 @@ var musicNumber = 3;
 var hiScore = new Array(musicNumber).fill(0);
 var keyCounter = new Array(musicNumber)
 keyCounter[1]=3;
-var notesNumber = 0;
-var notesArray = new Array(notesNumber).fill(true);
-var notesY = new Array(notesNumber).fill(0);
-var notesKey = new Array(notesNumber);
 var gameStart = false;
 //今の位置を表す変数
 //０がスタート画面、１がモード選択画面、２以降がゲーム画面を想定
@@ -254,6 +254,8 @@ function initGame(musicIndex) {
 }
 
 function drawGameView() {
+    let res = gameUsecase.nextFrame([]);
+
     context.strokeStyle = 'brack'
     drawLane(Object.keys(keyBidns).length)
     context.fillStyle = "#777700";
@@ -264,28 +266,6 @@ function drawGameView() {
     context.fillStyle = "black";
     context.fillText("Score",500,100);
     context.fillText("Combo",500,250);
-    for(let i=3;i<=5;i++){
-        if(PressedMomentArray[i]){
-            context.fillStyle = "rgba(255,255,0,0.4)";
-            context.fillRect(i*100-130,400,100,40);
-            context.fill();
-            console.log(i);
-        }else if(PressedArray[i]){
-            context.fillStyle = "rgba(255,255,0,0.1)";
-            context.fillRect(i*100-130,400,100,40);
-            context.fill();
-        }
-    }
-    for (let w = 0; w < notesArray.length; w++) {
-        if(notesArray[i]){
-            context.beginPath();
-            context.fillStyle = "red";
-            context.fillRect(270, notesY[i], 100, 40);  
-            context.fill();
-            notesY+=notesSpeed;
-            notesArray[i] = notesY[i] > 500;
-        }
-    }
 }
 
 let lane_topTime = 2.5;
@@ -338,7 +318,6 @@ function drawLane(numOfLane) {
     });
 
     // 小節線を表示
-    let res = gameUsecase.nextFrame([]);
     let bars = gameUsecase.getBarLineWithin(lane_bottomTime, lane_topTime);
     bars.forEach(({timing}) => {
         sp = getPos(numOfLane, 0,         getRatio(timing)-note_height/2);
@@ -350,7 +329,7 @@ function drawLane(numOfLane) {
 
     // ノーツを表示
     let notes = gameUsecase.getNotesWithin(lane_bottomTime, lane_topTime);
-    context.fillStyle = "#886633";
+    context.fillStyle = "#882288";
     notes.forEach(({timing, chord}) => {
         let index = chordList.indexOf(chord);
         sp = getPos(numOfLane, index,   getRatio(timing));
@@ -359,6 +338,24 @@ function drawLane(numOfLane) {
         context.fillRect(...args);
     });
     context.stroke();
+
+    
+    keyList.forEach((key, index) => {
+        if (isMomentPressed(key)) {
+            context.fillStyle = "rgba(255,255,0,0.5)";
+        } else if(isPressed(key)) {
+            context.fillStyle = "rgba(255,255,0,0.2)";
+        } else {
+            context.fillStyle = "rgba(255,255,0,0)";
+        }
+        //console.log(key, index, context.fillStyle);
+        sp = getPos(numOfLane, index,   getRatio(0));
+        ep = getPos(numOfLane, index+1, getRatio(0) - note_height);
+        console.log()
+        let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
+        context.fillRect(...args);
+        context.fill();
+    })
 }
 
 let debugFlg = true;
@@ -398,9 +395,6 @@ if(resetPressed){ //スタートに戻る
 if(nowplaying>=2&&!gameStart){
     if(EnterPressed){
         gameStart = true;
-        for (let index = 0; index < 100; index++) {
-            notesY[index] = 400-180*notesSpeed;    
-        }
     }
     drawSetSpeedView();
     if(PressedMomentArray[7]){
