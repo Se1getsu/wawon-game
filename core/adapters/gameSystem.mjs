@@ -287,6 +287,7 @@ let keyBidns;
 let keyList;
 let chordList;
 let bgmStartInterval;
+let finishInterval;
 function initGame(musicIndex) {
 
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
@@ -296,13 +297,14 @@ function initGame(musicIndex) {
 
     gameUsecase.setFps(120); // Chromeは 120FPS だった
 
-    bgmStartInterval = 300;
+    bgmStartInterval = gameUsecase.getFps() * 5;
     gameUsecase.setCurrentFrame(-bgmStartInterval);
     keyBidns = gameUsecase.getKeyBind();
     keyList = Object.keys(keyBidns);
     chordList = keyList.map(k => keyBidns[k]);
-    bgmStartInterval = 301;
+    bgmStartInterval++;
     bgmStartInterval += audioOffsets[musicIndex];
+    finishInterval = 0;
 }
 
 let judgeAnimationText;
@@ -314,7 +316,16 @@ function drawGameView() {
     })
     let {finished, judges, passed} = gameUsecase.nextFrame(pressedChords);
 
-    if (judges.length && judges[0] != "none") {
+    if (finishInterval > 0) {
+        finishInterval--;
+        if (finishInterval == 1) {
+            nowplaying = 3;
+        }
+
+    } else if (finished) {
+        finishInterval = 120
+
+    } else if (judges.length && judges[0] != "none") {
         judgeAnimationCount = 30;
         judgeAnimationText = judges[0];
 
@@ -502,33 +513,57 @@ function drawResultView() {
     context.drawImage(imgResultLogo,10,10);
     context.drawImage(imgResultpicture,-70,200);
 
-    let x = 400
+    let judges = gameUsecase.getJudges();
+
+    let x = 400;
     context.font = "26px Arial";
     context.textAlign = "right"
     context.fillStyle = "#dd0000";
     context.fillText("Just", x, 200);
 
+    context.textAlign = "right"
     context.fillStyle = "#e000e0";
     context.fillText("Great", x, 240);
 
+    context.textAlign = "right"
     context.fillStyle = "#006000";
     context.fillText("Good", x, 280);
     
+    context.textAlign = "right"
     context.fillStyle = "#000080";
     context.fillText("Bad", x, 320);
-    
+
+    context.textAlign = "right"
     context.fillStyle = "#555555";
     context.fillText("Miss", x, 360);
 
-    context.font = "42px Arial"
-    context.textAlign = "left"
+    x = 460;
+    context.fillStyle = "black";
+    context.font = "26px monospace"
+    context.fillText(judges.just, x+20, 200);
+    context.font = "26px monospace"
+    context.fillText(judges.great, x+20, 240);
+    context.font = "26px monospace"
+    context.fillText(judges.good, x+20, 280);
+    context.font = "26px monospace"
+    context.fillText(judges.bad, x+20, 320);
+    context.font = "26px monospace"
+    context.fillText(judges.miss, x+20, 360);
+
+
+    context.font = "42px Arial";
+    context.textAlign = "left";
     context.fillText("score  "+ gameUsecase.getCurrentScore(),330,430);
     context.fillText(musicUsecase.getTitle(),20,140);
+
+    context.font = "24px serif";
+    context.fillStyle = "#aaaaaa";
+    context.fillText("- Press 0 -",505,35);
 }
 
 
 
-let debugFlg = true;
+let debugFlg = false;
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 if (debugFlg) { nowplaying=3; gamemode=1; gameStart=true; initGame(0); debugFlg = false; }

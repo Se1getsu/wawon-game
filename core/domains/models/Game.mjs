@@ -45,6 +45,10 @@ export default class Game {
         return this.combo;
     }
 
+    get Judges() {
+        return this.judges;
+    }
+
     increaseCombo() {
         this.combo++;
     }
