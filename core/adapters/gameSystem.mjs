@@ -20,6 +20,8 @@ for (let i = 0; i < musicListUsecase.getLength(); i++) {
 }
 
 let gameUsecase;
+let musicUsecase;
+let chartUsecase;
 
 
 // ゲームを描画する領域の取得。2Dモードに設定。
@@ -226,34 +228,30 @@ function drawSelectMusicView() {
 
 // 【速さ設定画面】
 function drawSetSpeedView() {
-    /* var ctx = document.getElementById('canvas')
-    
-    context.fillStyle = 'brack';
-    context.font = "50px serif";
-    context.fillText("Speed",280,50);
-    context.fill(); */
-    //ここで文字を表示したい
-    // テキストを表示するスタイルを設定
     context.fillStyle = "black";
     context.font = "50px Arial";
-    context.fillText("Speed", 220, 100);
+    context.fillText("速さを設定", 180, 100);
     context.fillText(notesSpeed, 280, 200);
+    context.stroke();
+    context.font = "36px Arial";
+    context.fillText("↑ 速く  ↓ 遅く", 200, 300);
+    context.fillText("Enter 演奏開始", 190, 360);
+    context.stroke();
 }
 
 // 【ゲーム画面】
+let keyBidns;
+function initGame(musicIndex) {
+    musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
+    chartUsecase = musicUsecase.getChartUsecase();
+    gameUsecase = usecaseFactory.createGameUsecase();
+    gameUsecase.setChartUsecase(chartUsecase);
+    keyBidns = gameUsecase.getKeyBind();
+}
+
 function drawGameView() {
     context.strokeStyle = 'brack'
-    context.beginPath();
-    context.moveTo(270,0);
-    context.lineTo(270,480);
-    context.moveTo(370,0);
-    context.lineTo(370,480);
-    context.moveTo(170,0);
-    context.lineTo(170,480);
-    context.moveTo(470,0);
-    context.lineTo(470,480);
-    context.strokeRect(170, 400, 300, 40);
-    context.stroke();
+    drawLane(Object.keys(keyBidns).length)
     context.fillStyle = "black";
     context.font = "30px Arial";
     context.fillText("曲名",10,50);
@@ -283,6 +281,21 @@ function drawGameView() {
     }
 }
 
+function drawLane(numOfLane) {
+    numOfLane = 5
+    let l = 120, r = 470;
+    context.beginPath();
+    context.moveTo(l,0);
+    context.lineTo(l,480);
+    for (let i = 1; i <= numOfLane; i++) {
+        let x = l + (r-l)*(i/numOfLane);
+        context.moveTo(x,0);
+        context.lineTo(x,480);
+    }
+    context.strokeRect(l, 390, r-l, 30);
+    context.stroke();
+}
+
 
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -300,11 +313,11 @@ if(nowplaying==0){
 
 if(nowplaying==1){
     if(onePressed&&gamemode==0){
-        gamemode = 1;
+        gamemode = 1; initGame(0);
     }else if(twoPressed&&gamemode==0){
-        gamemode = 2;
+        gamemode = 2; initGame(1);
     }else if(threePressed&&gamemode==0){
-        gamemode = 3;
+        gamemode = 3; initGame(2);
     }
     drawSelectMusicView();
 }
@@ -324,10 +337,10 @@ if(nowplaying>=2&&!gameStart){
     }
     drawSetSpeedView();
     if(PressedMomentArray[7]){
-        notesSpeed++;
+        notesSpeed = Math.min(10, notesSpeed+1);
     }
     if(PressedMomentArray[8]){
-        notesSpeed--;
+        notesSpeed = Math.max(1, notesSpeed-1);
     }
 }
 

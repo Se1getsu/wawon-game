@@ -41,6 +41,10 @@ export default class GameUsecase {
         return this.game.Combo;
     }
 
+    getKeyBind() {
+        return this.chartUsecase.getKeyBind();
+    }
+
     nextFrame(inputChords) {
         let currentFrame = this.game.CurrentFrame;
         currentFrame++;
