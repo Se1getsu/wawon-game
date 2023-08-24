@@ -251,10 +251,10 @@ function drawSelectMusicView() {
         context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
         context.drawImage(imgpresss,20,10);
         context.fillStyle = "black";
-        context.font = "30px Arial";
-        context.fillText("曲名1",400,180);
-        context.fillText("曲名2",400,300);
-        context.fillText("曲名3",400,420);
+        context.font = "26px Arial";
+        context.fillText(musicListUsecase.getMusicUsecaseByIndex(0).getTitle(),310,180);
+        context.fillText(musicListUsecase.getMusicUsecaseByIndex(1).getTitle(),310,300);
+        context.fillText(musicListUsecase.getMusicUsecaseByIndex(2).getTitle(),310,420);
     }
     if(gamemode ==1&&interval >0){
         context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
