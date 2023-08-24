@@ -18,12 +18,12 @@ export default class ScoreCalculator {
         return Math.floor(
             this.baseScoreOfNote
             * this.judgeCoef[judge]
-            * calcComboCoef(combo)
+            * this.calcComboCoef(combo)
         );
     }
 
     calcComboCoef(combo) {
-        return Math.min(
+        return 1 + Math.min(
             Math.floor((combo-1) / 3) * 0.01,
             0.1
         );

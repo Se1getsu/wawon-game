@@ -1,5 +1,5 @@
-/* import InfrastructureFactory from "../infrastructures/factories/InfrastructureFactory.mjs";
-import UsecaseFactory from "/usecases/factories/UsecaseFactory.mjs";
+import InfrastructureFactory from "../infrastructures/factories/InfrastructureFactory.mjs";
+import UsecaseFactory from "../usecases/factories/UsecaseFactory.mjs";
 
 // ファクトリークラスのインスタンスを生成
 const infraFactory = new InfrastructureFactory();
@@ -17,7 +17,21 @@ for (let i = 0; i < musicListUsecase.getLength(); i++) {
     let chartFilePath = musicUsecase.getChartFile();
     json = await jsonReader.load(chartFilePath);
     musicUsecase.setChartByJson(json);
-} */
+}
+
+let gameUsecase;
+let musicUsecase;
+let chartUsecase;
+
+
+// 音楽のファイルを読み込む
+const audios = []
+for (let i = 0; i < musicListUsecase.getLength(); i++) {
+    musicUsecase = musicListUsecase.getMusicUsecaseByIndex(i);
+    let path = musicUsecase.getAudioFile();
+    audios.push(new Audio(path));
+}
+
 // ゲームを描画する領域の取得。2Dモードに設定。
 var canvas = document.getElementById('screen');
 var context = canvas.getContext('2d');
@@ -35,7 +49,7 @@ var resetPressed = false;
 var PressedArray = new Array().fill(false);
 var wasPressedArray = new Array().fill(false);
 var PressedMomentArray = new Array().fill(false);
-var nootuSpeed = 3;
+var notesSpeed = 3;
 function keyUpHandler(e){
     if(e.key === "Enter"){
         EnterPressed = false;
@@ -120,6 +134,27 @@ function keyDownHandler(e){
         PressedArray[8] = true;
     }
 }
+function isPressed(key) {
+    switch (key) {
+        case 'Enter':
+            return EnterPressed;
+        case '0':
+            return resetPressed;
+        case '1':
+            return onePressed;
+        case '2':
+            return twoPressed;
+        case '3':
+            return threePressed;
+        default:
+            let idx = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'ArrowUp', 'ArrowDown'].indexOf(key);
+            return PressedArray[idx];
+    }
+}
+function isMomentPressed(key) {
+    let idx = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'ArrowUp', 'ArrowDown'].indexOf(key);
+    return PressedMomentArray[idx];
+}
 //画像の変数
 //タイトル
 var imgTitleLogo = new Image();
@@ -182,38 +217,23 @@ var musicNumber = 3;
 var hiScore = new Array(musicNumber).fill(0);
 var keyCounter = new Array(musicNumber)
 keyCounter[1]=3;
-var nootuNumber = 0;
-var nootuArray = new Array(nootuNumber).fill(true);
-var nootuY = new Array(nootuNumber).fill(0);
-var nootuKey = new Array(nootuNumber);
-var judgement = new Array().fill(0);
 var gameStart = false;
 //今の位置を表す変数
 //０がスタート画面、１がモード選択画面、２以降がゲーム画面を想定
 var nowplaying = 0;
-//ループ
-function update(callback){
-    context.fillStyle = 'silver'
-context.fillRect(0, 0, 640, 480);
-for(let q=0;q<=8;q++){
-        if(PressedArray[q]&&!wasPressedArray[q]){
-            PressedMomentArray[q]=true;
-        }else{
-            PressedMomentArray[q]=false;
-        }
-        wasPressedArray[q]=PressedArray[q];
-    }
-if(nowplaying==0){
-    
-    if(TitleEnter&&TitleLogo){//タイトル画面の表示
-        context.drawImage(imgTitleLogo,0,0,400,342,120,100,500,500);
-        context.drawImage(imgTitleEnter,0,0,450,342,180,300,300,300);
-    }
-    if(EnterPressed){
-        nowplaying = 1;
+
+
+// 【タイトル画面】
+function drawTitleView() {
+    if(TitleEnter&&TitleLogo){
+        context.drawImage(imgTitleLogo,0,0,400,342,150,100,500,500);
+        context.drawImage(imgTitleEnter,0,0,450,342,160,300,300,300);
     }
 }
-if(nowplaying==1){//曲選択画面
+
+
+// 【曲選択画面】
+function drawSelectMusicView() {
     if (Musicone&&Musictwo&&Musicthree&&gamemode==0){
         
         context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
@@ -226,13 +246,6 @@ if(nowplaying==1){//曲選択画面
         context.fillText("曲名2",400,300);
         context.fillText("曲名3",400,420);
     }
-    if(onePressed&&gamemode==0){
-        gamemode = 1;
-    }else if(twoPressed&&gamemode==0){
-        gamemode = 2;
-    }else if(threePressed&&gamemode==0){
-        gamemode = 3;
-    }
     if(gamemode ==1&&interval >0){
         context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
         interval--;
@@ -243,83 +256,271 @@ if(nowplaying==1){//曲選択画面
         context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
         interval--;
     }
-    if(interval<=0){
-        nowplaying = gamemode+1;
+}
+
+
+// 【速さ設定画面】
+function drawSetSpeedView() {
+    context.fillStyle = "black";
+    context.font = "50px Arial";
+    context.fillText("速さを設定", 180, 100);
+    context.fillText(notesSpeed, 280, 200);
+    context.stroke();
+    context.font = "36px Arial";
+    context.fillText("↑ 速く  ↓ 遅く", 200, 300);
+    context.fillText("Enter 演奏開始", 190, 360);
+    context.stroke();
+}
+
+// 【ゲーム画面】
+let keyBidns;
+let keyList;
+let chordList;
+let bgmStartInterval = 300;
+function initGame(musicIndex) {
+    musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
+    chartUsecase = musicUsecase.getChartUsecase();
+    gameUsecase = usecaseFactory.createGameUsecase();
+    gameUsecase.setChartUsecase(chartUsecase);
+    gameUsecase.setCurrentFrame(-bgmStartInterval);
+    keyBidns = gameUsecase.getKeyBind();
+    keyList = Object.keys(keyBidns);
+    chordList = keyList.map(k => keyBidns[k]);
+    bgmStartInterval++;
+}
+
+let judgeAnimationText;
+let judgeAnimationCount = 0;
+function drawGameView() {
+    let pressedChords = []
+    keyList.forEach(key => {
+        if (isMomentPressed(key)) pressedChords.push(keyBidns[key]);
+    })
+    let {finished, judges, passed} = gameUsecase.nextFrame(pressedChords);
+
+    if (judges.length && judges[0] != "none") {
+        judgeAnimationCount = 30;
+        judgeAnimationText = judges[0];
+
+    } else if (passed) {
+        judgeAnimationCount = 30;
+        judgeAnimationText = "miss";
+    } else if (judgeAnimationCount > 0) {
+        let y = 360
+        if (judgeAnimationCount > 25) y += (judgeAnimationCount - 25) * 1.5
+
+        switch (judgeAnimationText) {
+            case "just":
+                context.fillStyle = "#dd0000";
+                context.font = "26px fantasy";
+                context.fillText("Just", lane_center-26, y);
+                break;
+            case "great":
+                context.fillStyle = "#e000e0";
+                context.font = "26px fantasy";
+                context.fillText("Great", lane_center-32, y);
+                break;
+            case "good":
+                context.fillStyle = "#006000";
+                context.font = "26px fantasy";
+                context.fillText("Good", lane_center-38, y);
+                break;
+            case "bad":
+                context.fillStyle = "#000080";
+                context.font = "26px fantasy";
+                context.fillText("Bad", lane_center-26, y);
+                break;
+            case "miss":
+                context.fillStyle = "#555555";
+                context.font = "26px fantasy";
+                context.fillText("Miss", lane_center-26, y);
+                break;
+        }
+        judgeAnimationCount--;
+
+    }
+
+    if (bgmStartInterval > 0) {
+        bgmStartInterval--;
+        if (bgmStartInterval == 0) startBgm();
+    }
+
+    drawLane(Object.keys(keyBidns).length)
+    context.fillStyle = "#777700";
+    context.fillRect(0, 0, 640, 35);
+    context.fillStyle = "#eeeeff";
+    context.font = "30px Arial";
+    context.fillText("曲名: " + musicUsecase.getTitle(),10,30);
+
+    let score = gameUsecase.getCurrentScore();
+    let combo = gameUsecase.getCombo();
+
+    context.fillStyle = "black";
+    context.fillText("Score", 500, 100);
+    context.font = "30px monospace"
+    context.textAlign = "right"
+    context.fillText(score,   590, 150);
+    context.font = "30px Arial";
+    context.textAlign = "left"
+    context.fillText("Combo", 500, 250);
+    context.font = "30px monospace"
+    context.textAlign = "center"
+    context.fillText(combo,   545, 300);
+    context.textAlign = "left"
+    context.stroke();
+}
+
+function startBgm() {
+    let path = musicUsecase.getAudioFile()
+}
+
+let lane_topTime = 2.5;
+let lane_bottomTime = -0.5;
+const lane_center = 270;
+const lane_width = 360;
+const lane_topY = 0;
+const lane_bottomY = 480;
+const note_height = 0.05;
+
+function getPos(numOfLane, lineIndex, yRatio) {
+    return {
+        x: lane_center + lane_width * (lineIndex/numOfLane - 1/2),
+        y: lane_topY * yRatio + lane_bottomY * (1-yRatio)
     }
 }
-if(resetPressed){//スタートに戻る
+
+function getRatio(time) {
+    return (time - lane_bottomTime)/(lane_topTime - lane_bottomTime)
+}
+
+function drawLane(numOfLane) {
+    let sp, ep;
+    
+    context.strokeStyle = '#666600'
+    context.beginPath();
+
+    // ベースレーン
+    for (let i = 0; i <= numOfLane; i++) {
+        sp = getPos(numOfLane, i, 1);
+        ep = getPos(numOfLane, i, 0);
+        context.moveTo(sp.x, sp.y);
+        context.lineTo(ep.x, ep.y);
+    }
+    // 判定ライン
+    sp = getPos(numOfLane, 0,         getRatio(0));
+    ep = getPos(numOfLane, numOfLane, getRatio(0));
+    context.moveTo(sp.x, sp.y);
+    context.lineTo(ep.x, ep.y);
+    sp = getPos(numOfLane, 0,         getRatio(0)-note_height);
+    ep = getPos(numOfLane, numOfLane, getRatio(0)-note_height);
+    context.moveTo(sp.x, sp.y);
+    context.lineTo(ep.x, ep.y);
+
+    // キー
+    context.fillStyle = "#555555";
+    context.font = "28px Arial";
+    keyList.forEach((key, i) => {
+        sp = getPos(numOfLane, i+0.5, 0.01);
+        context.fillText(key, sp.x-10, sp.y);
+    });
+
+    // 小節線を表示
+    let bars = gameUsecase.getBarLineWithin(lane_bottomTime, lane_topTime);
+    bars.forEach(({timing}) => {
+        sp = getPos(numOfLane, 0,         getRatio(timing)-note_height/2);
+        ep = getPos(numOfLane, numOfLane, getRatio(timing)-note_height/2);
+        context.moveTo(sp.x, sp.y);
+        context.lineTo(ep.x, ep.y);
+    });
+    context.stroke();
+
+    // ノーツを表示
+    let notes = gameUsecase.getNotesWithin(lane_bottomTime, lane_topTime);
+    context.fillStyle = "#882288";
+    notes.forEach(({timing, chord}) => {
+        let index = chordList.indexOf(chord);
+        sp = getPos(numOfLane, index,   getRatio(timing));
+        ep = getPos(numOfLane, index+1, getRatio(timing)-note_height);
+        let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
+        context.fillRect(...args);
+    });
+    context.stroke();
+
+    
+    keyList.forEach((key, index) => {
+        if (isMomentPressed(key)) {
+            context.fillStyle = "rgba(255,255,0,0.5)";
+        } else if(isPressed(key)) {
+            context.fillStyle = "rgba(255,255,0,0.2)";
+        } else {
+            context.fillStyle = "rgba(255,255,0,0)";
+        }
+        //console.log(key, index, context.fillStyle);
+        sp = getPos(numOfLane, index,   getRatio(0));
+        ep = getPos(numOfLane, index+1, getRatio(0) - note_height);
+        console.log()
+        let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
+        context.fillRect(...args);
+        context.fill();
+    })
+}
+
+let debugFlg = true;
+function update(callback){
+//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+if (debugFlg) { nowplaying=2; gameStart=true; initGame(0); debugFlg = false; }
+
+context.fillStyle = 'silver'
+context.fillRect(0, 0, 640, 480);
+for(let q=0;q<=8;q++){
+    PressedMomentArray[q] = PressedArray[q] && !wasPressedArray[q];
+    wasPressedArray[q]=PressedArray[q];
+}
+
+if(nowplaying==0){
+    drawTitleView();
+    if (EnterPressed) {
+        nowplaying = 1;
+        interval = 50;
+    }
+}
+
+if(nowplaying==1){
+    if(onePressed&&gamemode==0){
+        gamemode = 1; 
+    }else if(twoPressed&&gamemode==0){
+        gamemode = 2;
+    }else if(threePressed&&gamemode==0){
+        gamemode = 3;
+    }
+    drawSelectMusicView();
+    if(interval<=0){
+        nowplaying = 2;
+        initGame(gamemode-1);
+    }
+}
+
+if(resetPressed){ //スタートに戻る
     nowplaying = 0;
     gamemode = 0;
     interval = 50;
 }
+
 if(nowplaying>=2&&!gameStart){
     if(EnterPressed){
         gameStart = true;
-        for (let index = 0; index < 100; index++) {
-            nootuY[index] = 400-180*nootuSpeed;    
-        }
     }
-    /* var ctx = document.getElementById('canvas')
-    
-    context.fillStyle = 'brack';
-    context.font = "50px serif";
-    context.fillText("Speed",280,50);
-    context.fill(); */
-    //ここで文字を表示したい
-    // テキストを表示するスタイルを設定
-    context.fillStyle = "black";
-    context.font = "50px Arial";
-    context.fillText("Speed", 220, 100);
-    context.fillText(nootuSpeed, 280, 200);
+    drawSetSpeedView();
     if(PressedMomentArray[7]){
-        nootuSpeed++;
+        notesSpeed = Math.min(10, notesSpeed+1);
     }
     if(PressedMomentArray[8]){
-        nootuSpeed--;
+        notesSpeed = Math.max(1, notesSpeed-1);
     }
 }
+
 if(nowplaying == 2&&gameStart){
-    context.strokeStyle = 'brack'
-    context.beginPath();
-    context.moveTo(270,0);
-    context.lineTo(270,480);
-    context.moveTo(370,0);
-    context.lineTo(370,480);
-    context.moveTo(170,0);
-    context.lineTo(170,480);
-    context.moveTo(470,0);
-    context.lineTo(470,480);
-    context.strokeRect(170, 400, 300, 40);
-    context.stroke();
-    context.fillStyle = "black";
-    context.font = "30px Arial";
-    context.fillText("曲名",10,50);
-    context.fillText("Score",500,50);
-    context.fillText("Conbo",500,300)    
-    for(let i=3;i<=5;i++){
-        if(PressedMomentArray[i]){
-            context.fillStyle = "rgba(255,255,0,0.4)";
-            context.fillRect(i*100-130,400,100,40);
-            context.fill();
-            console.log(i);
-        }else if(PressedArray[i]){
-            context.fillStyle = "rgba(255,255,0,0.1)";
-            context.fillRect(i*100-130,400,100,40);
-            context.fill();
-        }
-    }
-    for (let w = 0; w < nootuArray.length; w++) {
-        if(nootuArray[i]){
-            context.beginPath();
-            context.fillStyle = "red";
-            context.fillRect(270, nootuY[i], 100, 40);  
-            context.fill();
-            nootuY+=nootuSpeed;
-            if(nootuY[i]>500){
-                nootuArray[i]=false;
-            }
-        }
-    }
+    drawGameView();
     if(nowplaying==5||PressedArray[0]){//リザルト画面、一旦zで出るようにする
         
         context.beginPath();
@@ -338,10 +539,10 @@ if(nowplaying == 2&&gameStart){
         context.fillText("score    "+score,400,400);
         context.fillText(musicUsecase.getTitle(),10,140);
  
-    }
     
 }
-window.requestAnimationFrame(update);
 
+//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ終了 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+window.requestAnimationFrame(update);
 }
 window.requestAnimationFrame(update);

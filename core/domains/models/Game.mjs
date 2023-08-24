@@ -21,6 +21,14 @@ export default class Game {
         this.currentScore += score;
     }
 
+    get Fps() {
+        return this.fps;
+    }
+
+    set Fps(fps) {
+        this.fps = fps;
+    }
+
     get CurrentScore() {
         return this.currentScore;
     }
@@ -34,10 +42,10 @@ export default class Game {
     }
 
     get Combo() {
-        return this.bpm;
+        return this.combo;
     }
 
-    incrementCombo() {
+    increaseCombo() {
         this.combo++;
     }
 
@@ -45,7 +53,7 @@ export default class Game {
         this.combo = 0;
     }
 
-    incrementJudge(judge) {
+    increaseJudge(judge) {
         this.judges[judge]++;
     }
 
