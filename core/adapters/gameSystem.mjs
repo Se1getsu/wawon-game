@@ -221,7 +221,7 @@ function drawSelectMusicView() {
         interval--;
     }
     if(interval<=0){
-        nowplaying = gamemode+1;
+        nowplaying = 2;
     }
 }
 
@@ -252,11 +252,14 @@ function initGame(musicIndex) {
 function drawGameView() {
     context.strokeStyle = 'brack'
     drawLane(Object.keys(keyBidns).length)
-    context.fillStyle = "black";
+    context.fillStyle = "#777700";
+    context.fillRect(0, 0, 640, 35);
+    context.fillStyle = "#eeeeff";
     context.font = "30px Arial";
-    context.fillText("曲名",10,50);
-    context.fillText("Score",500,50);
-    context.fillText("Combo",500,300);
+    context.fillText("曲名: " + musicUsecase.getTitle(),10,30);
+    context.fillStyle = "black";
+    context.fillText("Score",500,100);
+    context.fillText("Combo",500,250);
     for(let i=3;i<=5;i++){
         if(PressedMomentArray[i]){
             context.fillStyle = "rgba(255,255,0,0.4)";
@@ -281,24 +284,55 @@ function drawGameView() {
     }
 }
 
-function drawLane(numOfLane) {
-    numOfLane = 5
-    let l = 120, r = 470;
-    context.beginPath();
-    context.moveTo(l,0);
-    context.lineTo(l,480);
-    for (let i = 1; i <= numOfLane; i++) {
-        let x = l + (r-l)*(i/numOfLane);
-        context.moveTo(x,0);
-        context.lineTo(x,480);
+let lane_topTime = 2.5;
+let lane_bottomTime = -0.5;
+const lane_center = 270;
+const lane_width = 360;
+const lane_topY = 0;
+const lane_bottomY = 480;
+const note_height = 0.05;
+
+function getPos(numOfLane, lineIndex, yRatio) {
+    return {
+        x: lane_center + lane_width * (lineIndex/numOfLane - 1/2),
+        y: lane_topY * yRatio + lane_bottomY * (1-yRatio)
     }
-    context.strokeRect(l, 390, r-l, 30);
+}
+
+function getRatio(time) {
+    return (time - lane_bottomTime)/(lane_topTime - lane_bottomTime)
+}
+
+function drawLane(numOfLane) {
+    let sp, ep;
+    
+    context.beginPath();
+
+    // ベースレーン
+    for (let i = 0; i <= numOfLane; i++) {
+        sp = getPos(numOfLane, i, 1);
+        ep = getPos(numOfLane, i, 0);
+        context.moveTo(sp.x, sp.y);
+        context.lineTo(ep.x, ep.y);
+    }
+    // 判定ライン
+    sp = getPos(numOfLane, 0,         getRatio(0));
+    ep = getPos(numOfLane, numOfLane, getRatio(0));
+    context.moveTo(sp.x, sp.y);
+    context.lineTo(ep.x, ep.y);
+    sp = getPos(numOfLane, 0,         getRatio(0)-note_height);
+    ep = getPos(numOfLane, numOfLane, getRatio(0)-note_height);
+    context.moveTo(sp.x, sp.y);
+    context.lineTo(ep.x, ep.y);
+    
     context.stroke();
 }
 
 
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+nowplaying=2; gameStart=true; initGame(0);
+
 context.fillStyle = 'silver'
 context.fillRect(0, 0, 640, 480);
 for(let q=0;q<=8;q++){
