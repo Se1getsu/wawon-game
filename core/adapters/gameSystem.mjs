@@ -23,14 +23,24 @@ let gameUsecase;
 let musicUsecase;
 let chartUsecase;
 
-
 // 音楽のファイルを読み込む
 const audios = []
+const audioOffsets = []
 for (let i = 0; i < musicListUsecase.getLength(); i++) {
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(i);
     let path = musicUsecase.getAudioFile();
     audios.push(new Audio(path));
+    audioOffsets.push(musicUsecase.getOffset());
 }
+// 音楽のファイルを読み込む
+const chordSEs = {
+    Am: new Audio("resources/audios/chords/chord_Am.mp3"),
+    C: new Audio("resources/audios/chords/chord_C.mp3"),
+    D7: new Audio("resources/audios/chords/chord_D7.mp3"),
+    Dm: new Audio("resources/audios/chords/chord_Dm.mp3"),
+    F: new Audio("resources/audios/chords/chord_F.mp3"),
+    G7: new Audio("resources/audios/chords/chord_G7.mp3")
+};
 
 // ゲームを描画する領域の取得。2Dモードに設定。
 var canvas = document.getElementById('screen');
@@ -276,17 +286,23 @@ function drawSetSpeedView() {
 let keyBidns;
 let keyList;
 let chordList;
-let bgmStartInterval = 300;
+let bgmStartInterval;
 function initGame(musicIndex) {
+
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
     chartUsecase = musicUsecase.getChartUsecase();
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
+
+    gameUsecase.setFps(120); // Chromeは 120FPS だった
+
+    bgmStartInterval = 300;
     gameUsecase.setCurrentFrame(-bgmStartInterval);
     keyBidns = gameUsecase.getKeyBind();
     keyList = Object.keys(keyBidns);
     chordList = keyList.map(k => keyBidns[k]);
-    bgmStartInterval++;
+    bgmStartInterval = 301;
+    bgmStartInterval += audioOffsets[musicIndex];
 }
 
 let judgeAnimationText;
@@ -345,6 +361,10 @@ function drawGameView() {
         if (bgmStartInterval == 0) startBgm();
     }
 
+    if (pressedChords.length) {
+        playSE(pressedChords[0]);
+    }
+
     drawLane(Object.keys(keyBidns).length)
     context.fillStyle = "#777700";
     context.fillRect(0, 0, 640, 35);
@@ -371,7 +391,15 @@ function drawGameView() {
 }
 
 function startBgm() {
-    let path = musicUsecase.getAudioFile()
+    console.log("BGM "+(gamemode-1))
+    audios[gamemode-1].currentTime = 0;
+    audios[gamemode-1].play();
+}
+
+function playSE(chord) {
+    console.log("SE "+chord)
+    chordSEs[chord].currentTime = 0;
+    chordSEs[chord].play();
 }
 
 let lane_topTime = 2.5;
@@ -465,10 +493,10 @@ function drawLane(numOfLane) {
     })
 }
 
-let debugFlg = true;
+let debugFlg = false;
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-if (debugFlg) { nowplaying=2; gameStart=true; initGame(0); debugFlg = false; }
+if (debugFlg) { nowplaying=2; gamemode=1; gameStart=true; initGame(0); debugFlg = false; }
 
 context.fillStyle = 'silver'
 context.fillRect(0, 0, 640, 480);
@@ -504,6 +532,10 @@ if(resetPressed){ //スタートに戻る
     nowplaying = 0;
     gamemode = 0;
     interval = 50;
+    audios.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+    });
 }
 
 if(nowplaying>=2&&!gameStart){
@@ -521,6 +553,7 @@ if(nowplaying>=2&&!gameStart){
 
 if(nowplaying == 2&&gameStart){
     drawGameView();
+
     if(nowplaying==5||PressedArray[0]){//リザルト画面、一旦zで出るようにする
         
         context.beginPath();
@@ -539,7 +572,7 @@ if(nowplaying == 2&&gameStart){
         context.fillText("score    "+score,400,400);
         context.fillText(musicUsecase.getTitle(),10,140);
  
-    
+    }
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ終了 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
