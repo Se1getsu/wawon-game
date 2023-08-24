@@ -337,18 +337,27 @@ function drawLane(numOfLane) {
         context.fillText(key, sp.x-10, sp.y);
     });
 
-    // ノーツを表示
+    // 小節線を表示
     let res = gameUsecase.nextFrame([]);
+    let bars = gameUsecase.getBarLineWithin(lane_bottomTime, lane_topTime);
+    bars.forEach(({timing}) => {
+        sp = getPos(numOfLane, 0,         getRatio(timing)-note_height/2);
+        ep = getPos(numOfLane, numOfLane, getRatio(timing)-note_height/2);
+        context.moveTo(sp.x, sp.y);
+        context.lineTo(ep.x, ep.y);
+    });
+    context.stroke();
+
+    // ノーツを表示
     let notes = gameUsecase.getNotesWithin(lane_bottomTime, lane_topTime);
+    context.fillStyle = "#886633";
     notes.forEach(({timing, chord}) => {
         let index = chordList.indexOf(chord);
         sp = getPos(numOfLane, index,   getRatio(timing));
         ep = getPos(numOfLane, index+1, getRatio(timing)-note_height);
         let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
-        context.fillStyle = "#886633";
         context.fillRect(...args);
     });
-    
     context.stroke();
 }
 

@@ -80,6 +80,9 @@ export default class GameUsecase {
 
     getBarLineWithin(startTime, endTime) {
         let bps = this.getBpm() / 60;
+        let nowTime = this.game.CurrentFrame / this.getFps();
+        startTime += nowTime;
+        endTime += nowTime;
         let startBeatTime = Math.ceil(startTime * bps);
         let endBeatTime   = Math.ceil(endTime   * bps);
 
@@ -88,7 +91,7 @@ export default class GameUsecase {
         notes.forEach(({isHeadOfMeasure}, i) => {
             if (isHeadOfMeasure) {
                 result.push({
-                    timing: (startBeatTime + i) / bps
+                    timing: (startBeatTime + i) / bps - nowTime
                 });
             }
         });
