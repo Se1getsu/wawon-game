@@ -254,7 +254,13 @@ function initGame(musicIndex) {
 }
 
 function drawGameView() {
-    let res = gameUsecase.nextFrame([]);
+    let pressedChords = []
+    keyList.forEach(key => {
+        if (isMomentPressed(key)) pressedChords.push(keyBidns[key]);
+    })
+
+    let {finished, judges} = gameUsecase.nextFrame(pressedChords);
+    if(judges.length) console.log(judges);
 
     context.strokeStyle = 'brack'
     drawLane(Object.keys(keyBidns).length)
@@ -263,9 +269,15 @@ function drawGameView() {
     context.fillStyle = "#eeeeff";
     context.font = "30px Arial";
     context.fillText("曲名: " + musicUsecase.getTitle(),10,30);
+
+    let score = gameUsecase.getCurrentScore();
+    let combo = gameUsecase.getCombo();
+
     context.fillStyle = "black";
-    context.fillText("Score",500,100);
-    context.fillText("Combo",500,250);
+    context.fillText("Score", 500, 100);
+    context.fillText(score,   500, 150);
+    context.fillText("Combo", 500, 250);
+    context.fillText(combo,   500, 300);
 }
 
 let lane_topTime = 2.5;

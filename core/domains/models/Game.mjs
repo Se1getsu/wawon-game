@@ -42,10 +42,10 @@ export default class Game {
     }
 
     get Combo() {
-        return this.bpm;
+        return this.combo;
     }
 
-    incrementCombo() {
+    increaseCombo() {
         this.combo++;
     }
 
@@ -53,7 +53,7 @@ export default class Game {
         this.combo = 0;
     }
 
-    incrementJudge(judge) {
+    increaseJudge(judge) {
         this.judges[judge]++;
     }
 

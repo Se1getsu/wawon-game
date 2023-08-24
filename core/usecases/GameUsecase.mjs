@@ -8,13 +8,13 @@ export default class GameUsecase {
         this.judgeRule = judgeRule;
         this.scoreCalculator = scoreCalculator;
         
-        this.passedBeatTime = 0;
+        this.passedBeatTime = -1;
     }
 
     setChartUsecase(chartUsecase) {
         this.chartUsecase = chartUsecase;
         let notes = chartUsecase.getNotes();
-        this.isNotesShown = notes.map(note => note != '');
+        this.isNotesShown = notes.map(note => note.chord != '');
     }
 
     getBpm() {
@@ -50,9 +50,11 @@ export default class GameUsecase {
         currentFrame++;
         this.game.CurrentFrame = currentFrame;
 
+        let {judges, passed} = this._judgeChord([...inputChords]);
         return {
             finished: this.chartUsecase.getChartLength() < this.game.CurrentFrame * this.getBpf(),
-            judges: this._judgeChord([...inputChords])
+            judges: judges,
+            passed: passed
         }
     }
 
@@ -67,7 +69,7 @@ export default class GameUsecase {
         let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
         let result = []
         notes.forEach(({chord}, i) => {
-            if (chord) {
+            if (chord && this.isNotesShown[startBeatTime+i]) {
                 result.push({
                     timing: (startBeatTime + i) / bps - nowTime,
                     chord: chord
@@ -101,21 +103,22 @@ export default class GameUsecase {
 
     _judgeChord(inputChords) {
         let range = this.judgeRule.judgeFrameRange();
-        let maxBeatTime = Math.floor((this.currentFrame + range.max) * this.getBpf());
+        let maxBeatTime = Math.floor((this.game.CurrentFrame + range.max) * this.getBpf());
         let inputResult = new Array(inputChords.length).fill('miss');
-        
-        for (let i = this.passedBeatTime+1; i < maxBeatTime; i++) {
+        let passedNotesExists = false;
+
+        for (let i = this.passedBeatTime+1; i <= maxBeatTime; i++) {
             if (!this.isNotesShown[i]) continue;
             let {judge, passed} = this.judgeRule.judgeTiming(i, this.game.CurrentFrame, this.game.Fps, this.getBpm());
 
             inputChords.forEach((chord, j) => {
-                if (chord && chord === this.chartUsecase.getNoteByIndex(i).chord || passed) {
+                if (chord && chord === this.chartUsecase.getNoteOfIndex(i).chord || passed) {
                     if (this.judgeRule.judgeCombo(judge)) {
                         this.game.increaseCombo();
                     } else {
                         this.game.resetCombo();
                     }
-                    this.game.incrementJudge(judge);
+                    this.game.increaseJudge(judge);
                     this.game.increaseScore(this.scoreCalculator.calcNoteScore(
                         judge,
                         this.game.Combo
@@ -128,10 +131,17 @@ export default class GameUsecase {
                 }
             })
 
-            if (passed) this.passedBeatTime = i;
+            if (passed) {
+                this.passedBeatTime = i;
+                passedNotesExists = true;
+                this.isNotesShown[i] = false;
+            }
         }
 
-        return inputResult
+        return {
+            judges: inputResult,
+            passed: passedNotesExists
+        }
     }
 
     _getCurrentBeatTime() {
