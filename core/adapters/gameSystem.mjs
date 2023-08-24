@@ -59,7 +59,7 @@ var resetPressed = false;
 var PressedArray = new Array().fill(false);
 var wasPressedArray = new Array().fill(false);
 var PressedMomentArray = new Array().fill(false);
-var notesSpeed = 3;
+let notesSpeed = 3;
 function keyUpHandler(e){
     if(e.key === "Enter"){
         EnterPressed = false;
@@ -288,8 +288,9 @@ let keyList;
 let chordList;
 let bgmStartInterval;
 let finishInterval;
+let lane_topTime = 2.5;
+let lane_bottomTime = -0.5;
 function initGame(musicIndex) {
-
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
     chartUsecase = musicUsecase.getChartUsecase();
     gameUsecase = usecaseFactory.createGameUsecase();
@@ -305,6 +306,10 @@ function initGame(musicIndex) {
     bgmStartInterval++;
     bgmStartInterval += audioOffsets[musicIndex];
     finishInterval = 0;
+
+    console.log(notesSpeed);
+    lane_topTime = 7.5 / notesSpeed;
+    lane_bottomTime = -1.5 / notesSpeed;
 }
 
 let judgeAnimationText;
@@ -413,8 +418,6 @@ function playSE(chord) {
     chordSEs[chord].play();
 }
 
-let lane_topTime = 2.5;
-let lane_bottomTime = -0.5;
 const lane_center = 270;
 const lane_width = 360;
 const lane_topY = 0;
@@ -614,7 +617,7 @@ if(nowplaying>=2&&!gameStart){
     }
     drawSetSpeedView();
     if(PressedMomentArray[7]){
-        notesSpeed = Math.min(10, notesSpeed+1);
+        notesSpeed = Math.min(20, notesSpeed+1);
     }
     if(PressedMomentArray[8]){
         notesSpeed = Math.max(1, notesSpeed-1);
