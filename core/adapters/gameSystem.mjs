@@ -323,7 +323,7 @@ if(nowplaying == 2&&gameStart){
         context.font = "50px Arial"
         context.fillText("score    "+score,400,400);
         context.fillText(musicUsecase.getTitle(),10,140);
-
+ 
     }
     
 }
