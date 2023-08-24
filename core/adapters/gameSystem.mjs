@@ -245,6 +245,7 @@ function initGame(musicIndex) {
     chartUsecase = musicUsecase.getChartUsecase();
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
+    gameUsecase.setCurrentFrame(-300);
     keyBidns = gameUsecase.getKeyBind();
     keyList = Object.keys(keyBidns);
     chordList = keyList.map(k => keyBidns[k]);
@@ -259,7 +260,14 @@ function drawGameView() {
     })
     let {finished, judges, passed} = gameUsecase.nextFrame(pressedChords);
 
-    if (judgeAnimationCount > 0) {
+    if (judges.length && judges[0] != "none") {
+        judgeAnimationCount = 30;
+        judgeAnimationText = judges[0];
+
+    } else if (passed) {
+        judgeAnimationCount = 30;
+        judgeAnimationText = "miss";
+    } else if (judgeAnimationCount > 0) {
         let y = 360
         if (judgeAnimationCount > 25) y += (judgeAnimationCount - 25) * 1.5
 
@@ -292,13 +300,6 @@ function drawGameView() {
         }
         judgeAnimationCount--;
 
-    } else if (judges.length && judges[0] != "none") {
-        judgeAnimationCount = 30;
-        judgeAnimationText = judges[0];
-
-    } else if (passed) {
-        judgeAnimationCount = 30;
-        judgeAnimationText = "miss";
     }
 
     drawLane(Object.keys(keyBidns).length)
@@ -313,9 +314,17 @@ function drawGameView() {
 
     context.fillStyle = "black";
     context.fillText("Score", 500, 100);
-    context.fillText(score,   500, 150);
+    context.font = "30px monospace"
+    context.textAlign = "right"
+    context.fillText(score,   590, 150);
+    context.font = "30px Arial";
+    context.textAlign = "left"
     context.fillText("Combo", 500, 250);
-    context.fillText(combo,   500, 300);
+    context.font = "30px monospace"
+    context.textAlign = "center"
+    context.fillText(combo,   545, 300);
+    context.textAlign = "left"
+    context.stroke();
 }
 
 let lane_topTime = 2.5;

@@ -17,6 +17,10 @@ export default class GameUsecase {
         this.isNotesShown = notes.map(note => note.chord != '');
     }
 
+    setCurrentFrame(frame) {
+        this.game.CurrentFrame = frame;
+    }
+
     getBpm() {
         return this.chartUsecase.getBpm();
     }
@@ -66,12 +70,14 @@ export default class GameUsecase {
         let startBeatTime = Math.ceil(startTime * bps);
         let endBeatTime   = Math.ceil(endTime   * bps);
 
-        let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
-        let result = []
+        let startIndex = Math.max(0, startBeatTime);
+        let endIndex = Math.min(this.chartUsecase.getChartLength()-1, endBeatTime);
+        let notes = this.chartUsecase.getNotesInRange(startIndex, endIndex);
+        let result = [];
         notes.forEach(({chord}, i) => {
-            if (chord && this.isNotesShown[startBeatTime+i]) {
+            if (chord && this.isNotesShown[startIndex+i]) {
                 result.push({
-                    timing: (startBeatTime + i) / bps - nowTime,
+                    timing: (startIndex + i) / bps - nowTime,
                     chord: chord
                 });
             }
@@ -88,12 +94,14 @@ export default class GameUsecase {
         let startBeatTime = Math.ceil(startTime * bps);
         let endBeatTime   = Math.ceil(endTime   * bps);
 
-        let notes = this.chartUsecase.getNotesInRange(startBeatTime, endBeatTime);
+        let startIndex = Math.max(0, startBeatTime);
+        let endIndex = Math.min(this.chartUsecase.getChartLength()-1, endBeatTime);
+        let notes = this.chartUsecase.getNotesInRange(startIndex, endIndex);
         let result = []
         notes.forEach(({isHeadOfMeasure}, i) => {
             if (isHeadOfMeasure) {
                 result.push({
-                    timing: (startBeatTime + i) / bps - nowTime
+                    timing: (startIndex + i) / bps - nowTime
                 });
             }
         });
