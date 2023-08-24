@@ -1,5 +1,5 @@
-/* import InfrastructureFactory from "../infrastructures/factories/InfrastructureFactory.mjs";
-import UsecaseFactory from "/usecases/factories/UsecaseFactory.mjs";
+import InfrastructureFactory from "../infrastructures/factories/InfrastructureFactory.mjs";
+import UsecaseFactory from "../usecases/factories/UsecaseFactory.mjs";
 
 // ファクトリークラスのインスタンスを生成
 const infraFactory = new InfrastructureFactory();
@@ -17,7 +17,11 @@ for (let i = 0; i < musicListUsecase.getLength(); i++) {
     let chartFilePath = musicUsecase.getChartFile();
     json = await jsonReader.load(chartFilePath);
     musicUsecase.setChartByJson(json);
-} */
+}
+
+let gameUsecase;
+
+
 // ゲームを描画する領域の取得。2Dモードに設定。
 var canvas = document.getElementById('screen');
 var context = canvas.getContext('2d');
@@ -35,7 +39,7 @@ var resetPressed = false;
 var PressedArray = new Array().fill(false);
 var wasPressedArray = new Array().fill(false);
 var PressedMomentArray = new Array().fill(false);
-var nootuSpeed = 3;
+var notesSpeed = 3;
 function keyUpHandler(e){
     if(e.key === "Enter"){
         EnterPressed = false;
@@ -120,6 +124,23 @@ function keyDownHandler(e){
         PressedArray[8] = true;
     }
 }
+function isPressed(key) {
+    switch (key) {
+        case 'Enter':
+            return EnterPressed;
+        case '0':
+            return resetPressed;
+        case '1':
+            return onePressed;
+        case '2':
+            return twoPressed;
+        case '3':
+            return threePressed;
+        default:
+            let idx = ['z', 'x', 'c', 'v', 'b', 'n', 'm', 'ArrowUp', 'ArrowDown'].indexOf(key);
+            return PressedMomentArray[idx];
+    }
+}
 //画像の変数
 //タイトル
 var imgTitleLogo = new Image();
@@ -161,48 +182,31 @@ var musicNumber = 3;
 var hiScore = new Array(musicNumber).fill(0);
 var keyCounter = new Array(musicNumber)
 keyCounter[1]=3;
-var nootuNumber = 0;
-var nootuArray = new Array(nootuNumber).fill(true);
-var nootuY = new Array(nootuNumber).fill(0);
-var nootuKey = new Array(nootuNumber);
+var notesNumber = 0;
+var notesArray = new Array(notesNumber).fill(true);
+var notesY = new Array(notesNumber).fill(0);
+var notesKey = new Array(notesNumber);
 var gameStart = false;
 //今の位置を表す変数
 //０がスタート画面、１がモード選択画面、２以降がゲーム画面を想定
 var nowplaying = 0;
-//ループ
-function update(callback){
-    context.fillStyle = 'silver'
-context.fillRect(0, 0, 640, 480);
-for(let q=0;q<=8;q++){
-        if(PressedArray[q]&&!wasPressedArray[q]){
-            PressedMomentArray[q]=true;
-        }else{
-            PressedMomentArray[q]=false;
-        }
-        wasPressedArray[q]=PressedArray[q];
-    }
-if(nowplaying==0){
-    
-    if(TitleEnter&&TitleLogo){//タイトル画面の表示
+
+
+// 【タイトル画面】
+function drawTitleView() {
+    if(TitleEnter&&TitleLogo){
         context.drawImage(imgTitleLogo,0,0,400,342,150,100,500,500);
         context.drawImage(imgTitleEnter,0,0,450,342,160,300,300,300);
     }
-    if(EnterPressed){
-        nowplaying = 1;
-    }
 }
-if(nowplaying==1){//曲選択画面
+
+
+// 【曲選択画面】
+function drawSelectMusicView() {
     if (Musicone&&Musictwo&&Musicthree&&gamemode==0){
         context.drawImage(imgMusicone,0,0,400,342,40,30,400,400);
         context.drawImage(imgMusictwo,0,0,400,342,40,160,400,400);
         context.drawImage(imgMusicthree,0,0,400,342,40,290,400,400);
-    }
-    if(onePressed&&gamemode==0){
-        gamemode = 1;
-    }else if(twoPressed&&gamemode==0){
-        gamemode = 2;
-    }else if(threePressed&&gamemode==0){
-        gamemode = 3;
     }
     if(gamemode ==1&&interval >0){
         context.drawImage(imgMusicone,0,0,400,342,40,30,400,400);
@@ -218,18 +222,10 @@ if(nowplaying==1){//曲選択画面
         nowplaying = gamemode+1;
     }
 }
-if(resetPressed){//スタートに戻る
-    nowplaying = 0;
-    gamemode = 0;
-    interval = 50;
-}
-if(nowplaying>=2&&!gameStart){
-    if(EnterPressed){
-        gameStart = true;
-        for (let index = 0; index < 100; index++) {
-            nootuY[index] = 400-180*nootuSpeed;    
-        }
-    }
+
+
+// 【速さ設定画面】
+function drawSetSpeedView() {
     /* var ctx = document.getElementById('canvas')
     
     context.fillStyle = 'brack';
@@ -241,15 +237,11 @@ if(nowplaying>=2&&!gameStart){
     context.fillStyle = "black";
     context.font = "50px Arial";
     context.fillText("Speed", 220, 100);
-    context.fillText(nootuSpeed, 280, 200);
-    if(PressedMomentArray[7]){
-        nootuSpeed++;
-    }
-    if(PressedMomentArray[8]){
-        nootuSpeed--;
-    }
+    context.fillText(notesSpeed, 280, 200);
 }
-if(nowplaying == 2&&gameStart){
+
+// 【ゲーム画面】
+function drawGameView() {
     context.strokeStyle = 'brack'
     context.beginPath();
     context.moveTo(270,0);
@@ -266,7 +258,7 @@ if(nowplaying == 2&&gameStart){
     context.font = "30px Arial";
     context.fillText("曲名",10,50);
     context.fillText("Score",500,50);
-    context.fillText("Conbo",500,300)    
+    context.fillText("Combo",500,300);
     for(let i=3;i<=5;i++){
         if(PressedMomentArray[i]){
             context.fillStyle = "rgba(255,255,0,0.4)";
@@ -279,21 +271,71 @@ if(nowplaying == 2&&gameStart){
             context.fill();
         }
     }
-    for (let w = 0; w < nootuArray.length; w++) {
-        if(nootuArray[i]){
+    for (let w = 0; w < notesArray.length; w++) {
+        if(notesArray[i]){
             context.beginPath();
             context.fillStyle = "red";
-            context.fillRect(270, nootuY[i], 100, 40);  
+            context.fillRect(270, notesY[i], 100, 40);  
             context.fill();
-            nootuY+=nootuSpeed;
-            if(nootuY[i]>500){
-                nootuArray[i]=false;
-            }
+            notesY+=notesSpeed;
+            notesArray[i] = notesY[i] > 500;
         }
     }
-    
 }
-window.requestAnimationFrame(update);
 
+
+function update(callback){
+//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+context.fillStyle = 'silver'
+context.fillRect(0, 0, 640, 480);
+for(let q=0;q<=8;q++){
+    PressedMomentArray[q] = PressedArray[q] && !wasPressedArray[q];
+    wasPressedArray[q]=PressedArray[q];
+}
+
+if(nowplaying==0){
+    drawTitleView();
+    if (EnterPressed) nowplaying = 1;
+}
+
+if(nowplaying==1){
+    if(onePressed&&gamemode==0){
+        gamemode = 1;
+    }else if(twoPressed&&gamemode==0){
+        gamemode = 2;
+    }else if(threePressed&&gamemode==0){
+        gamemode = 3;
+    }
+    drawSelectMusicView();
+}
+
+if(resetPressed){ //スタートに戻る
+    nowplaying = 0;
+    gamemode = 0;
+    interval = 50;
+}
+
+if(nowplaying>=2&&!gameStart){
+    if(EnterPressed){
+        gameStart = true;
+        for (let index = 0; index < 100; index++) {
+            notesY[index] = 400-180*notesSpeed;    
+        }
+    }
+    drawSetSpeedView();
+    if(PressedMomentArray[7]){
+        notesSpeed++;
+    }
+    if(PressedMomentArray[8]){
+        notesSpeed--;
+    }
+}
+
+if(nowplaying == 2&&gameStart){
+    drawGameView();
+}
+
+//＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ終了 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+window.requestAnimationFrame(update);
 }
 window.requestAnimationFrame(update);
