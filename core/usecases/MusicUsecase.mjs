@@ -13,6 +13,11 @@ export default class MusicUsecase {
         this.music.Title = json.title;
         this.music.File = json.file;
         this.chartPath = json.chart;
+        this.offset = json.offset;
+    }
+
+    getOffset() {
+        return this.offset;
     }
 
     setChartByJson(json) {
