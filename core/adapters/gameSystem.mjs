@@ -138,12 +138,15 @@ imgTitleEnter.onload = function(){
 var imgMusicone = new Image();
 var imgMusictwo = new Image();
 var imgMusicthree = new Image();
+var imgpresss = new Image();
 imgMusicone.src = './resources/img/music1.png';
 imgMusictwo.src = './resources/img/music2.png';
 imgMusicthree.src = './resources/img/music3.png';
+imgpresss.src = './resources/img/musicpress.png';
 var Musicone = false;
 var Musictwo = false;
 var Musicthree = false;
+var presss = false;
 imgMusicone.onload = function(){
     Musicone = true;
 }
@@ -153,6 +156,10 @@ imgMusictwo.onload = function(){
 imgMusicthree.onload = function(){
     Musicthree = true;
 }
+imgpresss.onload = function(){
+    presss = true;
+}
+
 var interval = 50;
 var gamemode = 0;
 //リザルト画面
@@ -199,8 +206,8 @@ for(let q=0;q<=8;q++){
 if(nowplaying==0){
     
     if(TitleEnter&&TitleLogo){//タイトル画面の表示
-        context.drawImage(imgTitleLogo,0,0,400,342,150,100,500,500);
-        context.drawImage(imgTitleEnter,0,0,450,342,160,300,300,300);
+        context.drawImage(imgTitleLogo,0,0,400,342,120,100,500,500);
+        context.drawImage(imgTitleEnter,0,0,450,342,180,300,300,300);
     }
     if(EnterPressed){
         nowplaying = 1;
@@ -208,9 +215,16 @@ if(nowplaying==0){
 }
 if(nowplaying==1){//曲選択画面
     if (Musicone&&Musictwo&&Musicthree&&gamemode==0){
-        context.drawImage(imgMusicone,0,0,400,342,40,30,400,400);
-        context.drawImage(imgMusictwo,0,0,400,342,40,160,400,400);
-        context.drawImage(imgMusicthree,0,0,400,342,40,290,400,400);
+        
+        context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
+        context.drawImage(imgMusictwo,0,0,400,342,40,220,400,400);
+        context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
+        context.drawImage(imgpresss,20,10);
+        context.fillStyle = "black";
+        context.font = "30px Arial";
+        context.fillText("曲名1",400,180);
+        context.fillText("曲名2",400,300);
+        context.fillText("曲名3",400,420);
     }
     if(onePressed&&gamemode==0){
         gamemode = 1;
@@ -220,13 +234,13 @@ if(nowplaying==1){//曲選択画面
         gamemode = 3;
     }
     if(gamemode ==1&&interval >0){
-        context.drawImage(imgMusicone,0,0,400,342,40,30,400,400);
+        context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
         interval--;
     }else if(gamemode==2&&interval >0){
-        context.drawImage(imgMusictwo,0,0,400,342,40,160,400,400);
+        context.drawImage(imgMusictwo,0,0,400,342,40,220,400,400);
         interval--;
     }else if(gamemode==3&&interval >0){
-        context.drawImage(imgMusicthree,0,0,400,342,40,290,400,400);
+        context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
         interval--;
     }
     if(interval<=0){
