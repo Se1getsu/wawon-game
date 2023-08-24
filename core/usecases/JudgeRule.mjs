@@ -50,4 +50,8 @@ export default class JudgeRule {
             passed: delta <= -7.5
         };
     }
+
+    judgeCombo(judge) {
+        return judge === "just" || judge === "great";
+    }
 }

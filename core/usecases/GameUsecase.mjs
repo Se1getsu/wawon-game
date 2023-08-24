@@ -37,6 +37,10 @@ export default class GameUsecase {
         return this.game.CurrentScore;
     }
 
+    getCombo() {
+        return this.game.Combo;
+    }
+
     nextFrame(inputChords) {
         let currentFrame = this.game.CurrentFrame;
         currentFrame++;
@@ -97,6 +101,11 @@ export default class GameUsecase {
                     this.game.increaseScore(this.scoreCalculator.calcNoteScore(
                         judge
                     ));
+                    if (this.judgeRule.judgeCombo(judge)) {
+                        this.game.increaseCombo();
+                    } else {
+                        this.game.resetCombo();
+                    }
                     inputChords[j] = '';
                     inputResult[j] = judge;
                     this.isNotesShown[i] = false;
