@@ -493,10 +493,45 @@ function drawLane(numOfLane) {
     })
 }
 
-let debugFlg = false;
+// 【結果画面】
+function drawResultView() {
+    context.beginPath();
+    context.fillStyle = "white"
+    context.fillRect(0, 0, 640, 480);
+
+    context.drawImage(imgResultLogo,10,10);
+    context.drawImage(imgResultpicture,-70,200);
+
+    let x = 400
+    context.font = "26px Arial";
+    context.textAlign = "right"
+    context.fillStyle = "#dd0000";
+    context.fillText("Just", x, 200);
+
+    context.fillStyle = "#e000e0";
+    context.fillText("Great", x, 240);
+
+    context.fillStyle = "#006000";
+    context.fillText("Good", x, 280);
+    
+    context.fillStyle = "#000080";
+    context.fillText("Bad", x, 320);
+    
+    context.fillStyle = "#555555";
+    context.fillText("Miss", x, 360);
+
+    context.font = "42px Arial"
+    context.textAlign = "left"
+    context.fillText("score  "+ gameUsecase.getCurrentScore(),330,430);
+    context.fillText(musicUsecase.getTitle(),20,140);
+}
+
+
+
+let debugFlg = true;
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-if (debugFlg) { nowplaying=2; gamemode=1; gameStart=true; initGame(0); debugFlg = false; }
+if (debugFlg) { nowplaying=3; gamemode=1; gameStart=true; initGame(0); debugFlg = false; }
 
 context.fillStyle = 'silver'
 context.fillRect(0, 0, 640, 480);
@@ -554,25 +589,8 @@ if(nowplaying>=2&&!gameStart){
 if(nowplaying == 2&&gameStart){
     drawGameView();
 
-    if(nowplaying==5||PressedArray[0]){//リザルト画面、一旦zで出るようにする
-        
-        context.beginPath();
-        context.fillStyle = "white"
-        context.fillRect(0, 0, 640, 480);
-        context.drawImage(imgResultLogo,10,10);
-        context.drawImage(imgResultpicture,-70,200);
-        context.fillStyle = "black"
-        context.font = "30px Arial";
-        context.fillText("just   "+judgement[5],400,50);
-        context.fillText("great  "+judgement[4],380,100);
-        context.fillText("good   "+judgement[3],360,150);
-        context.fillText("but     "+judgement[2],340,200);
-        context.fillText("miss    "+judgement[1],320,250);
-        context.font = "50px Arial"
-        context.fillText("score    "+score,400,400);
-        context.fillText(musicUsecase.getTitle(),10,140);
- 
-    }
+}else if(nowplaying==3){
+    drawResultView();
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ終了 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
