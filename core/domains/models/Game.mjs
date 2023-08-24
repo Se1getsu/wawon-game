@@ -21,6 +21,14 @@ export default class Game {
         this.currentScore += score;
     }
 
+    get Fps() {
+        return this.fps;
+    }
+
+    set Fps(fps) {
+        this.fps = fps;
+    }
+
     get CurrentScore() {
         return this.currentScore;
     }

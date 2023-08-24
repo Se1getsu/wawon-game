@@ -242,6 +242,7 @@ function drawSetSpeedView() {
 // 【ゲーム画面】
 let keyBidns;
 let keyList;
+let chordList;
 function initGame(musicIndex) {
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
     chartUsecase = musicUsecase.getChartUsecase();
@@ -249,6 +250,7 @@ function initGame(musicIndex) {
     gameUsecase.setChartUsecase(chartUsecase);
     keyBidns = gameUsecase.getKeyBind();
     keyList = Object.keys(keyBidns);
+    chordList = keyList.map(k => keyBidns[k]);
 }
 
 function drawGameView() {
@@ -334,14 +336,26 @@ function drawLane(numOfLane) {
         sp = getPos(numOfLane, i+0.5, 0.01);
         context.fillText(key, sp.x-10, sp.y);
     });
+
+    // ノーツを表示
+    let res = gameUsecase.nextFrame([]);
+    let notes = gameUsecase.getNotesWithin(lane_bottomTime, lane_topTime);
+    notes.forEach(({timing, chord}) => {
+        let index = chordList.indexOf(chord);
+        sp = getPos(numOfLane, index,   getRatio(timing));
+        ep = getPos(numOfLane, index+1, getRatio(timing)-note_height);
+        let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
+        context.fillStyle = "#886633";
+        context.fillRect(...args);
+    });
     
     context.stroke();
 }
 
-
+let debugFlg = true;
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-nowplaying=2; gameStart=true; initGame(0);
+if (debugFlg) { nowplaying=2; gameStart=true; initGame(0); debugFlg = false; }
 
 context.fillStyle = 'silver'
 context.fillRect(0, 0, 640, 480);
