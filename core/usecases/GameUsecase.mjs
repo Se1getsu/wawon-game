@@ -104,7 +104,7 @@ export default class GameUsecase {
     _judgeChord(inputChords) {
         let range = this.judgeRule.judgeFrameRange();
         let maxBeatTime = Math.floor((this.game.CurrentFrame + range.max) * this.getBpf());
-        let inputResult = new Array(inputChords.length).fill('miss');
+        let inputResult = new Array(inputChords.length).fill('none');
         let passedNotesExists = false;
 
         for (let i = this.passedBeatTime+1; i <= maxBeatTime; i++) {
@@ -133,6 +133,7 @@ export default class GameUsecase {
 
             if (passed) {
                 this.passedBeatTime = i;
+                this.game.resetCombo();
                 passedNotesExists = true;
                 this.isNotesShown[i] = false;
             }

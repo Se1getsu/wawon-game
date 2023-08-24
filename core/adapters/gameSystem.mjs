@@ -220,9 +220,6 @@ function drawSelectMusicView() {
         context.drawImage(imgMusicthree,0,0,400,342,40,290,400,400);
         interval--;
     }
-    if(interval<=0){
-        nowplaying = 2;
-    }
 }
 
 
@@ -253,16 +250,57 @@ function initGame(musicIndex) {
     chordList = keyList.map(k => keyBidns[k]);
 }
 
+let judgeAnimationText;
+let judgeAnimationCount = 0;
 function drawGameView() {
     let pressedChords = []
     keyList.forEach(key => {
         if (isMomentPressed(key)) pressedChords.push(keyBidns[key]);
     })
+    let {finished, judges, passed} = gameUsecase.nextFrame(pressedChords);
 
-    let {finished, judges} = gameUsecase.nextFrame(pressedChords);
-    if(judges.length) console.log(judges);
+    if (judgeAnimationCount > 0) {
+        let y = 360
+        if (judgeAnimationCount > 25) y += (judgeAnimationCount - 25) * 1.5
 
-    context.strokeStyle = 'brack'
+        switch (judgeAnimationText) {
+            case "just":
+                context.fillStyle = "#dd0000";
+                context.font = "26px fantasy";
+                context.fillText("Just", lane_center-26, y);
+                break;
+            case "great":
+                context.fillStyle = "#e000e0";
+                context.font = "26px fantasy";
+                context.fillText("Great", lane_center-32, y);
+                break;
+            case "good":
+                context.fillStyle = "#006000";
+                context.font = "26px fantasy";
+                context.fillText("Good", lane_center-38, y);
+                break;
+            case "bad":
+                context.fillStyle = "#000080";
+                context.font = "26px fantasy";
+                context.fillText("Bad", lane_center-26, y);
+                break;
+            case "miss":
+                context.fillStyle = "#555555";
+                context.font = "26px fantasy";
+                context.fillText("Miss", lane_center-26, y);
+                break;
+        }
+        judgeAnimationCount--;
+
+    } else if (judges.length && judges[0] != "none") {
+        judgeAnimationCount = 30;
+        judgeAnimationText = judges[0];
+
+    } else if (passed) {
+        judgeAnimationCount = 30;
+        judgeAnimationText = "miss";
+    }
+
     drawLane(Object.keys(keyBidns).length)
     context.fillStyle = "#777700";
     context.fillRect(0, 0, 640, 35);
@@ -302,6 +340,7 @@ function getRatio(time) {
 function drawLane(numOfLane) {
     let sp, ep;
     
+    context.strokeStyle = '#666600'
     context.beginPath();
 
     // ベースレーン
@@ -384,18 +423,25 @@ for(let q=0;q<=8;q++){
 
 if(nowplaying==0){
     drawTitleView();
-    if (EnterPressed) nowplaying = 1;
+    if (EnterPressed) {
+        nowplaying = 1;
+        interval = 50;
+    }
 }
 
 if(nowplaying==1){
     if(onePressed&&gamemode==0){
-        gamemode = 1; initGame(0);
+        gamemode = 1; 
     }else if(twoPressed&&gamemode==0){
-        gamemode = 2; initGame(1);
+        gamemode = 2;
     }else if(threePressed&&gamemode==0){
-        gamemode = 3; initGame(2);
+        gamemode = 3;
     }
     drawSelectMusicView();
+    if(interval<=0){
+        nowplaying = 2;
+        initGame(gamemode-1);
+    }
 }
 
 if(resetPressed){ //スタートに戻る
