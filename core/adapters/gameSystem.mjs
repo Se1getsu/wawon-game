@@ -24,6 +24,14 @@ let musicUsecase;
 let chartUsecase;
 
 
+// 音楽のファイルを読み込む
+const audios = []
+for (let i = 0; i < musicListUsecase.getLength(); i++) {
+    musicUsecase = musicListUsecase.getMusicUsecaseByIndex(i);
+    let path = musicUsecase.getAudioFile();
+    audios.push(new Audio(path));
+}
+
 // ゲームを描画する領域の取得。2Dモードに設定。
 var canvas = document.getElementById('screen');
 var context = canvas.getContext('2d');
@@ -240,15 +248,17 @@ function drawSetSpeedView() {
 let keyBidns;
 let keyList;
 let chordList;
+let bgmStartInterval = 300;
 function initGame(musicIndex) {
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
     chartUsecase = musicUsecase.getChartUsecase();
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
-    gameUsecase.setCurrentFrame(-300);
+    gameUsecase.setCurrentFrame(-bgmStartInterval);
     keyBidns = gameUsecase.getKeyBind();
     keyList = Object.keys(keyBidns);
     chordList = keyList.map(k => keyBidns[k]);
+    bgmStartInterval++;
 }
 
 let judgeAnimationText;
@@ -302,6 +312,11 @@ function drawGameView() {
 
     }
 
+    if (bgmStartInterval > 0) {
+        bgmStartInterval--;
+        if (bgmStartInterval == 0) startBgm();
+    }
+
     drawLane(Object.keys(keyBidns).length)
     context.fillStyle = "#777700";
     context.fillRect(0, 0, 640, 35);
@@ -325,6 +340,10 @@ function drawGameView() {
     context.fillText(combo,   545, 300);
     context.textAlign = "left"
     context.stroke();
+}
+
+function startBgm() {
+    let path = musicUsecase.getAudioFile()
 }
 
 let lane_topTime = 2.5;
