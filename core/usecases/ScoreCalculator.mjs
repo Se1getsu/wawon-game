@@ -14,9 +14,19 @@ export default class ScoreCalculator {
         }
     }
 
-    calcNoteScore(judge) {
-        return this.baseScoreOfNote
-            * this.judgeCoef[judge];
+    calcNoteScore(judge, combo) {
+        return Math.floor(
+            this.baseScoreOfNote
+            * this.judgeCoef[judge]
+            * calcComboCoef(combo)
+        );
+    }
+
+    calcComboCoef(combo) {
+        return Math.min(
+            Math.floor((combo-1) / 3) * 0.01,
+            0.1
+        );
     }
 
 }

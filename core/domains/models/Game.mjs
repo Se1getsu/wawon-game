@@ -14,6 +14,7 @@ export default class Game {
             bad:    0,
             miss:   0
         }
+        this.combo = 0;
     }
 
     increaseScore(score) {
@@ -30,6 +31,18 @@ export default class Game {
 
     set CurrentFrame(currentFrame) {
         this.currentFrame = currentFrame;
+    }
+
+    get Combo() {
+        return this.bpm;
+    }
+
+    incrementCombo() {
+        this.combo++;
+    }
+
+    resetCombo() {
+        this.combo = 0;
     }
 
     incrementJudge(judge) {
