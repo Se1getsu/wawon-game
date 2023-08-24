@@ -97,15 +97,17 @@ export default class GameUsecase {
 
             inputChords.forEach((chord, j) => {
                 if (chord && chord === this.chartUsecase.getNoteByIndex(i).chord || passed) {
-                    this.game.incrementJudge(judge);
-                    this.game.increaseScore(this.scoreCalculator.calcNoteScore(
-                        judge
-                    ));
                     if (this.judgeRule.judgeCombo(judge)) {
                         this.game.increaseCombo();
                     } else {
                         this.game.resetCombo();
                     }
+                    this.game.incrementJudge(judge);
+                    this.game.increaseScore(this.scoreCalculator.calcNoteScore(
+                        judge,
+                        this.game.Combo
+                    ));
+
                     inputChords[j] = '';
                     inputResult[j] = judge;
                     this.isNotesShown[i] = false;
