@@ -236,8 +236,8 @@ var nowplaying = 0;
 // 【タイトル画面】
 function drawTitleView() {
     if(TitleEnter&&TitleLogo){
-        context.drawImage(imgTitleLogo,0,0,400,342,150,100,500,500);
-        context.drawImage(imgTitleEnter,0,0,450,342,160,300,300,300);
+        context.drawImage(imgTitleLogo,0,0,400,342,120,120,500,500);
+        context.drawImage(imgTitleEnter,0,0,450,342,180,300,300,300);
     }
 }
 
