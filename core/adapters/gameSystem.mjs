@@ -241,12 +241,14 @@ function drawSetSpeedView() {
 
 // 【ゲーム画面】
 let keyBidns;
+let keyList;
 function initGame(musicIndex) {
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
     chartUsecase = musicUsecase.getChartUsecase();
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
     keyBidns = gameUsecase.getKeyBind();
+    keyList = Object.keys(keyBidns);
 }
 
 function drawGameView() {
@@ -324,6 +326,14 @@ function drawLane(numOfLane) {
     ep = getPos(numOfLane, numOfLane, getRatio(0)-note_height);
     context.moveTo(sp.x, sp.y);
     context.lineTo(ep.x, ep.y);
+
+    // キー
+    context.fillStyle = "#555555";
+    context.font = "28px Arial";
+    keyList.forEach((key, i) => {
+        sp = getPos(numOfLane, i+0.5, 0.01);
+        context.fillText(key, sp.x-10, sp.y);
+    });
     
     context.stroke();
 }
