@@ -173,12 +173,15 @@ imgTitleEnter.onload = function(){
 var imgMusicone = new Image();
 var imgMusictwo = new Image();
 var imgMusicthree = new Image();
+var imgpresss = new Image();
 imgMusicone.src = './resources/img/music1.png';
 imgMusictwo.src = './resources/img/music2.png';
 imgMusicthree.src = './resources/img/music3.png';
+imgpresss.src = './resources/img/musicpress.png';
 var Musicone = false;
 var Musictwo = false;
 var Musicthree = false;
+var presss = false;
 imgMusicone.onload = function(){
     Musicone = true;
 }
@@ -188,8 +191,26 @@ imgMusictwo.onload = function(){
 imgMusicthree.onload = function(){
     Musicthree = true;
 }
+imgpresss.onload = function(){
+    presss = true;
+}
+
 var interval = 50;
 var gamemode = 0;
+//リザルト画面
+var resultLogo = false;
+var resultPicture = false;
+var imgResultLogo = new Image();
+var imgResultpicture = new Image();
+imgResultLogo.src = './resources/img/resultLogo.png'
+imgResultpicture.src = './resources/img/resultPicture.png'
+imgResultLogo.onload = function () {
+    resultLogo = true;
+}
+imgResultpicture.onload = function(){
+    resultPicture = true;
+}
+
 //ゲーム画面内の変数
 var score = 0;
 var musicNumber = 3;
@@ -214,18 +235,25 @@ function drawTitleView() {
 // 【曲選択画面】
 function drawSelectMusicView() {
     if (Musicone&&Musictwo&&Musicthree&&gamemode==0){
-        context.drawImage(imgMusicone,0,0,400,342,40,30,400,400);
-        context.drawImage(imgMusictwo,0,0,400,342,40,160,400,400);
-        context.drawImage(imgMusicthree,0,0,400,342,40,290,400,400);
+        
+        context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
+        context.drawImage(imgMusictwo,0,0,400,342,40,220,400,400);
+        context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
+        context.drawImage(imgpresss,20,10);
+        context.fillStyle = "black";
+        context.font = "30px Arial";
+        context.fillText("曲名1",400,180);
+        context.fillText("曲名2",400,300);
+        context.fillText("曲名3",400,420);
     }
     if(gamemode ==1&&interval >0){
-        context.drawImage(imgMusicone,0,0,400,342,40,30,400,400);
+        context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
         interval--;
     }else if(gamemode==2&&interval >0){
-        context.drawImage(imgMusictwo,0,0,400,342,40,160,400,400);
+        context.drawImage(imgMusictwo,0,0,400,342,40,220,400,400);
         interval--;
     }else if(gamemode==3&&interval >0){
-        context.drawImage(imgMusicthree,0,0,400,342,40,290,400,400);
+        context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
         interval--;
     }
 }
@@ -493,6 +521,25 @@ if(nowplaying>=2&&!gameStart){
 
 if(nowplaying == 2&&gameStart){
     drawGameView();
+    if(nowplaying==5||PressedArray[0]){//リザルト画面、一旦zで出るようにする
+        
+        context.beginPath();
+        context.fillStyle = "white"
+        context.fillRect(0, 0, 640, 480);
+        context.drawImage(imgResultLogo,10,10);
+        context.drawImage(imgResultpicture,-70,200);
+        context.fillStyle = "black"
+        context.font = "30px Arial";
+        context.fillText("just   "+judgement[5],400,50);
+        context.fillText("great  "+judgement[4],380,100);
+        context.fillText("good   "+judgement[3],360,150);
+        context.fillText("but     "+judgement[2],340,200);
+        context.fillText("miss    "+judgement[1],320,250);
+        context.font = "50px Arial"
+        context.fillText("score    "+score,400,400);
+        context.fillText(musicUsecase.getTitle(),10,140);
+ 
+    
 }
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ終了 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
