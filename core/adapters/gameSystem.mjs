@@ -524,7 +524,7 @@ function drawResultView() {
 
     let judges = gameUsecase.getJudges();
 
-    let x = 400;
+    let x = 430;
     context.font = "26px Arial";
     context.textAlign = "right"
     context.fillStyle = "#dd0000";
@@ -546,7 +546,7 @@ function drawResultView() {
     context.fillStyle = "#555555";
     context.fillText("Miss", x, 360);
 
-    x = 460;
+    x = 490;
     context.fillStyle = "black";
     context.font = "26px monospace"
     context.fillText(judges.just, x+20, 200);
