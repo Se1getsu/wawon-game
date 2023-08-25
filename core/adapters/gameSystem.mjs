@@ -412,13 +412,11 @@ function drawGameView() {
 }
 
 function startBgm() {
-    console.log("BGM "+(gamemode-1))
     audios[gamemode-1].currentTime = 0;
     audios[gamemode-1].play();
 }
 
 function playSE(chord) {
-    console.log("SE "+chord)
     chordSEs[chord].currentTime = 0;
     chordSEs[chord].play();
 }
@@ -503,10 +501,8 @@ function drawLane(numOfLane) {
         } else {
             context.fillStyle = "rgba(255,255,0,0)";
         }
-        //console.log(key, index, context.fillStyle);
         sp = getPos(numOfLane, index,   getRatio(0));
         ep = getPos(numOfLane, index+1, getRatio(0) - note_height);
-        console.log()
         let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
         context.fillRect(...args);
         context.fill();
