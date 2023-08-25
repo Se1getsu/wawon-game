@@ -5,6 +5,10 @@ h1 {
     border-image-slice: 1;
 }
 
+p {
+    color: #aaaaaa;
+}
+
 body {
     height: 100vh;
     background-color: #0a0a0a;
