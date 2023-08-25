@@ -307,7 +307,6 @@ function initGame(musicIndex) {
     bgmStartInterval += audioOffsets[musicIndex];
     finishInterval = 0;
 
-    console.log(notesSpeed);
     lane_topTime = 7.5 / notesSpeed;
     lane_bottomTime = -1.5 / notesSpeed;
 }
@@ -325,6 +324,7 @@ function drawGameView() {
         finishInterval--;
         if (finishInterval == 1) {
             nowplaying = 3;
+            gameStart = false;
         }
 
     } else if (finished) {
@@ -597,7 +597,6 @@ if(nowplaying==1){
     drawSelectMusicView();
     if(interval<=0){
         nowplaying = 2;
-        initGame(gamemode-1);
     }
 }
 
@@ -609,11 +608,13 @@ if(resetPressed){ //スタートに戻る
         audio.pause();
         audio.currentTime = 0;
     });
+    gameStart = false;
 }
 
-if(nowplaying>=2&&!gameStart){
+if(nowplaying==2&&!gameStart){
     if(EnterPressed){
         gameStart = true;
+        initGame(gamemode-1);
     }
     drawSetSpeedView();
     if(PressedMomentArray[7]){
