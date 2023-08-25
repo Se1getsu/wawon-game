@@ -239,6 +239,7 @@ function drawTitleView() {
         context.drawImage(imgTitleLogo,0,0,400,342,120,120,500,500);
         context.drawImage(imgTitleEnter,0,0,450,342,180,300,300,300);
     }
+    drawFps();
 }
 
 
@@ -252,6 +253,7 @@ function drawSelectMusicView() {
         context.drawImage(imgpresss,20,10);
         context.fillStyle = "black";
         context.font = "26px Arial";
+        context.textAlign = "left";
         context.fillText(musicListUsecase.getMusicUsecaseByIndex(0).getTitle(),310,180);
         context.fillText(musicListUsecase.getMusicUsecaseByIndex(1).getTitle(),310,300);
         context.fillText(musicListUsecase.getMusicUsecaseByIndex(2).getTitle(),310,420);
@@ -266,6 +268,7 @@ function drawSelectMusicView() {
         context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
         interval--;
     }
+    drawFps();
 }
 
 
@@ -275,6 +278,7 @@ function drawSetSpeedView() {
     context.fillStyle = 'silver';
     context.fillRect(0, 0, 640, 480);
     context.fillStyle = "black";
+    context.textAlign = "left";
     context.font = "50px Arial";
     context.fillText("速さを設定", 180, 100);
     context.fillText(notesSpeed, 280, 200);
@@ -283,6 +287,7 @@ function drawSetSpeedView() {
     context.fillText("↑ 速く  ↓ 遅く", 200, 300);
     context.fillText("Enter 演奏開始", 190, 360);
     context.stroke();
+    drawFps();
 }
 
 // 【ゲーム画面】
@@ -299,7 +304,7 @@ function initGame(musicIndex) {
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
 
-    // gameUsecase.setFps(120);
+    gameUsecase.setFps(fps);
 
     bgmStartInterval = gameUsecase.getFps() * 5;
     gameUsecase.setCurrentFrame(-bgmStartInterval);
@@ -307,7 +312,7 @@ function initGame(musicIndex) {
     keyList = Object.keys(keyBidns);
     chordList = keyList.map(k => keyBidns[k]);
     bgmStartInterval++;
-    bgmStartInterval += audioOffsets[musicIndex];
+    bgmStartInterval += Math.floor(audioOffsets[musicIndex] * fps / 60);
     finishInterval = 0;
 
     lane_topTime = 7.5 / notesSpeed;
@@ -322,6 +327,8 @@ function drawGameView() {
         if (isMomentPressed(key)) pressedChords.push(keyBidns[key]);
     })
     let {finished, judges, passed} = gameUsecase.nextFrame(pressedChords);
+
+    context.textAlign = "left";
 
     if (finishInterval > 0) {
         finishInterval--;
@@ -409,16 +416,15 @@ function drawGameView() {
     context.fillText(combo ? combo : "",   545, 305);
     context.textAlign = "left"
     context.stroke();
+    drawFps();
 }
 
 function startBgm() {
-    console.log("BGM "+(gamemode-1))
     audios[gamemode-1].currentTime = 0;
     audios[gamemode-1].play();
 }
 
 function playSE(chord) {
-    console.log("SE "+chord)
     chordSEs[chord].currentTime = 0;
     chordSEs[chord].play();
 }
@@ -503,10 +509,8 @@ function drawLane(numOfLane) {
         } else {
             context.fillStyle = "rgba(255,255,0,0)";
         }
-        //console.log(key, index, context.fillStyle);
         sp = getPos(numOfLane, index,   getRatio(0));
         ep = getPos(numOfLane, index+1, getRatio(0) - note_height);
-        console.log()
         let args = [sp.x, sp.y, ep.x-sp.x, ep.y-sp.y]
         context.fillRect(...args);
         context.fill();
@@ -524,7 +528,7 @@ function drawResultView() {
 
     let judges = gameUsecase.getJudges();
 
-    let x = 400;
+    let x = 430;
     context.font = "26px Arial";
     context.textAlign = "right"
     context.fillStyle = "#dd0000";
@@ -546,7 +550,7 @@ function drawResultView() {
     context.fillStyle = "#555555";
     context.fillText("Miss", x, 360);
 
-    x = 460;
+    x = 490;
     context.fillStyle = "black";
     context.font = "26px monospace"
     context.fillText(judges.just, x+20, 200);
@@ -568,14 +572,40 @@ function drawResultView() {
     context.font = "24px serif";
     context.fillStyle = "#aaaaaa";
     context.fillText("- Press 0 -",505,35);
+    drawFps();
+}
+
+// FPSを表示
+function drawFps() {
+    context.beginPath();
+    context.font = "20px Arial";
+    context.fillStyle = "#777777";
+    context.textAlign = "right";
+    context.fillText(fps+"FPS",635,475);
+    context.stroke();
 }
 
 
 
 let debugFlg = false;
+let fps = 0, frameCount = 0;
+let startFpsTime, endFpsTime;
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 if (debugFlg) { nowplaying=3; gamemode=1; gameStart=true; initGame(0); debugFlg = false; }
+
+// FPS計測
+if (!startFpsTime) {
+    startFpsTime = new Date().getTime();
+} else {
+    frameCount++;
+    endFpsTime = new Date().getTime();
+    if(endFpsTime - startFpsTime >= 1000){
+        fps = Math.round(frameCount/30)*30;
+        frameCount = 0;
+        startFpsTime = new Date().getTime();
+    }
+}
 
 context.fillStyle = 'silver'
 context.fillRect(0, 0, 640, 480);
@@ -618,7 +648,7 @@ if(resetPressed){ //スタートに戻る
 }
 
 if(nowplaying==2&&!gameStart){
-    if(EnterPressed){
+    if(EnterPressed && fps){
         gameStart = true;
         initGame(gamemode-1);
     }
