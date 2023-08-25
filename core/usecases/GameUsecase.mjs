@@ -146,6 +146,7 @@ export default class GameUsecase {
             if (passed) {
                 this.passedBeatTime = i;
                 this.game.resetCombo();
+                this.game.increaseJudge("miss");
                 passedNotesExists = true;
                 this.isNotesShown[i] = false;
             }
