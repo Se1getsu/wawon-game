@@ -271,6 +271,9 @@ function drawSelectMusicView() {
 
 // 【速さ設定画面】
 function drawSetSpeedView() {
+    context.beginPath();
+    context.fillStyle = 'silver';
+    context.fillRect(0, 0, 640, 480);
     context.fillStyle = "black";
     context.font = "50px Arial";
     context.fillText("速さを設定", 180, 100);
