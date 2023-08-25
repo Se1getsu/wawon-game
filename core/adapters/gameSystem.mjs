@@ -404,9 +404,9 @@ function drawGameView() {
     context.font = "30px Arial";
     context.textAlign = "left"
     context.fillText("Combo", 500, 250);
-    context.font = "30px monospace"
+    context.font = "42px monospace"
     context.textAlign = "center"
-    context.fillText(combo,   545, 300);
+    context.fillText(combo ? combo : "",   545, 305);
     context.textAlign = "left"
     context.stroke();
 }
