@@ -59,7 +59,7 @@ var resetPressed = false;
 var PressedArray = new Array().fill(false);
 var wasPressedArray = new Array().fill(false);
 var PressedMomentArray = new Array().fill(false);
-var notesSpeed = 3;
+let notesSpeed = 3;
 function keyUpHandler(e){
     if(e.key === "Enter"){
         EnterPressed = false;
@@ -236,8 +236,8 @@ var nowplaying = 0;
 // 【タイトル画面】
 function drawTitleView() {
     if(TitleEnter&&TitleLogo){
-        context.drawImage(imgTitleLogo,0,0,400,342,150,100,500,500);
-        context.drawImage(imgTitleEnter,0,0,450,342,160,300,300,300);
+        context.drawImage(imgTitleLogo,0,0,400,342,120,120,500,500);
+        context.drawImage(imgTitleEnter,0,0,450,342,180,300,300,300);
     }
 }
 
@@ -251,10 +251,10 @@ function drawSelectMusicView() {
         context.drawImage(imgMusicthree,0,0,400,342,40,340,400,400);
         context.drawImage(imgpresss,20,10);
         context.fillStyle = "black";
-        context.font = "30px Arial";
-        context.fillText("曲名1",400,180);
-        context.fillText("曲名2",400,300);
-        context.fillText("曲名3",400,420);
+        context.font = "26px Arial";
+        context.fillText(musicListUsecase.getMusicUsecaseByIndex(0).getTitle(),310,180);
+        context.fillText(musicListUsecase.getMusicUsecaseByIndex(1).getTitle(),310,300);
+        context.fillText(musicListUsecase.getMusicUsecaseByIndex(2).getTitle(),310,420);
     }
     if(gamemode ==1&&interval >0){
         context.drawImage(imgMusicone,0,0,400,342,40,100,400,400);
@@ -271,6 +271,9 @@ function drawSelectMusicView() {
 
 // 【速さ設定画面】
 function drawSetSpeedView() {
+    context.beginPath();
+    context.fillStyle = 'silver';
+    context.fillRect(0, 0, 640, 480);
     context.fillStyle = "black";
     context.font = "50px Arial";
     context.fillText("速さを設定", 180, 100);
@@ -287,22 +290,28 @@ let keyBidns;
 let keyList;
 let chordList;
 let bgmStartInterval;
+let finishInterval;
+let lane_topTime = 2.5;
+let lane_bottomTime = -0.5;
 function initGame(musicIndex) {
-
     musicUsecase = musicListUsecase.getMusicUsecaseByIndex(musicIndex);
     chartUsecase = musicUsecase.getChartUsecase();
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
 
-    gameUsecase.setFps(120); // Chromeは 120FPS だった
+    // gameUsecase.setFps(120);
 
-    bgmStartInterval = 300;
+    bgmStartInterval = gameUsecase.getFps() * 5;
     gameUsecase.setCurrentFrame(-bgmStartInterval);
     keyBidns = gameUsecase.getKeyBind();
     keyList = Object.keys(keyBidns);
     chordList = keyList.map(k => keyBidns[k]);
-    bgmStartInterval = 301;
+    bgmStartInterval++;
     bgmStartInterval += audioOffsets[musicIndex];
+    finishInterval = 0;
+
+    lane_topTime = 7.5 / notesSpeed;
+    lane_bottomTime = -1.5 / notesSpeed;
 }
 
 let judgeAnimationText;
@@ -314,7 +323,17 @@ function drawGameView() {
     })
     let {finished, judges, passed} = gameUsecase.nextFrame(pressedChords);
 
-    if (judges.length && judges[0] != "none") {
+    if (finishInterval > 0) {
+        finishInterval--;
+        if (finishInterval == 1) {
+            nowplaying = 3;
+            gameStart = false;
+        }
+
+    } else if (finished) {
+        finishInterval = 120
+
+    } else if (judges.length && judges[0] != "none") {
         judgeAnimationCount = 30;
         judgeAnimationText = judges[0];
 
@@ -366,6 +385,8 @@ function drawGameView() {
     }
 
     drawLane(Object.keys(keyBidns).length)
+
+    context.beginPath();
     context.fillStyle = "#777700";
     context.fillRect(0, 0, 640, 35);
     context.fillStyle = "#eeeeff";
@@ -383,9 +404,9 @@ function drawGameView() {
     context.font = "30px Arial";
     context.textAlign = "left"
     context.fillText("Combo", 500, 250);
-    context.font = "30px monospace"
+    context.font = "42px monospace"
     context.textAlign = "center"
-    context.fillText(combo,   545, 300);
+    context.fillText(combo ? combo : "",   545, 305);
     context.textAlign = "left"
     context.stroke();
 }
@@ -402,8 +423,6 @@ function playSE(chord) {
     chordSEs[chord].play();
 }
 
-let lane_topTime = 2.5;
-let lane_bottomTime = -0.5;
 const lane_center = 270;
 const lane_width = 360;
 const lane_topY = 0;
@@ -461,6 +480,7 @@ function drawLane(numOfLane) {
         context.lineTo(ep.x, ep.y);
     });
     context.stroke();
+    context.beginPath();
 
     // ノーツを表示
     let notes = gameUsecase.getNotesWithin(lane_bottomTime, lane_topTime);
@@ -502,33 +522,57 @@ function drawResultView() {
     context.drawImage(imgResultLogo,10,10);
     context.drawImage(imgResultpicture,-70,200);
 
-    let x = 400
+    let judges = gameUsecase.getJudges();
+
+    let x = 400;
     context.font = "26px Arial";
     context.textAlign = "right"
     context.fillStyle = "#dd0000";
     context.fillText("Just", x, 200);
 
+    context.textAlign = "right"
     context.fillStyle = "#e000e0";
     context.fillText("Great", x, 240);
 
+    context.textAlign = "right"
     context.fillStyle = "#006000";
     context.fillText("Good", x, 280);
     
+    context.textAlign = "right"
     context.fillStyle = "#000080";
     context.fillText("Bad", x, 320);
-    
+
+    context.textAlign = "right"
     context.fillStyle = "#555555";
     context.fillText("Miss", x, 360);
 
-    context.font = "42px Arial"
-    context.textAlign = "left"
+    x = 460;
+    context.fillStyle = "black";
+    context.font = "26px monospace"
+    context.fillText(judges.just, x+20, 200);
+    context.font = "26px monospace"
+    context.fillText(judges.great, x+20, 240);
+    context.font = "26px monospace"
+    context.fillText(judges.good, x+20, 280);
+    context.font = "26px monospace"
+    context.fillText(judges.bad, x+20, 320);
+    context.font = "26px monospace"
+    context.fillText(judges.miss, x+20, 360);
+
+
+    context.font = "42px Arial";
+    context.textAlign = "left";
     context.fillText("score  "+ gameUsecase.getCurrentScore(),330,430);
     context.fillText(musicUsecase.getTitle(),20,140);
+
+    context.font = "24px serif";
+    context.fillStyle = "#aaaaaa";
+    context.fillText("- Press 0 -",505,35);
 }
 
 
 
-let debugFlg = true;
+let debugFlg = false;
 function update(callback){
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝ ループ ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 if (debugFlg) { nowplaying=3; gamemode=1; gameStart=true; initGame(0); debugFlg = false; }
@@ -559,7 +603,6 @@ if(nowplaying==1){
     drawSelectMusicView();
     if(interval<=0){
         nowplaying = 2;
-        initGame(gamemode-1);
     }
 }
 
@@ -571,15 +614,17 @@ if(resetPressed){ //スタートに戻る
         audio.pause();
         audio.currentTime = 0;
     });
+    gameStart = false;
 }
 
-if(nowplaying>=2&&!gameStart){
+if(nowplaying==2&&!gameStart){
     if(EnterPressed){
         gameStart = true;
+        initGame(gamemode-1);
     }
     drawSetSpeedView();
     if(PressedMomentArray[7]){
-        notesSpeed = Math.min(10, notesSpeed+1);
+        notesSpeed = Math.min(20, notesSpeed+1);
     }
     if(PressedMomentArray[8]){
         notesSpeed = Math.max(1, notesSpeed-1);

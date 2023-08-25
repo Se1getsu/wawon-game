@@ -49,6 +49,10 @@ export default class GameUsecase {
         return this.chartUsecase.getKeyBind();
     }
 
+    getJudges() {
+        return this.game.Judges;
+    }
+
     nextFrame(inputChords) {
         let currentFrame = this.game.CurrentFrame;
         currentFrame++;
@@ -142,6 +146,7 @@ export default class GameUsecase {
             if (passed) {
                 this.passedBeatTime = i;
                 this.game.resetCombo();
+                this.game.increaseJudge("miss");
                 passedNotesExists = true;
                 this.isNotesShown[i] = false;
             }

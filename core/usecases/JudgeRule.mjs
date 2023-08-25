@@ -11,8 +11,8 @@ export default class JudgeRule {
 
     judgeFrameRange() {
         return {
-            min: -7.5,
-            max: 7.5
+            min: -9.5,
+            max: 9.5
         };
     }
 
@@ -26,19 +26,19 @@ export default class JudgeRule {
                 passed: false
             };
 
-        } else if (-5.0 < delta && delta <= 5.0) {
+        } else if (-6.0 < delta && delta <= 6.0) {
             return {
                 judge: "great",
                 passed: false
             };
 
-        } else if (-6.5 < delta && delta <= 6.5) {
+        } else if (-7.5 < delta && delta <= 7.5) {
             return {
                 judge: "good",
                 passed: false
             };
 
-        } else if (-7.5 < delta && delta <= 7.5) {
+        } else if (-9.5 < delta && delta <= 9.5) {
             return {
                 judge: "bad",
                 passed: false
@@ -46,8 +46,8 @@ export default class JudgeRule {
         }
         
         return {
-            judge: "bad",
-            passed: delta <= -7.5
+            judge: "miss",
+            passed: delta <= -9.5
         };
     }
 
