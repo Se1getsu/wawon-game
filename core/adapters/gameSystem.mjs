@@ -299,7 +299,7 @@ function initGame(musicIndex) {
     gameUsecase = usecaseFactory.createGameUsecase();
     gameUsecase.setChartUsecase(chartUsecase);
 
-    gameUsecase.setFps(120); // Chromeは 120FPS だった
+    // gameUsecase.setFps(120);
 
     bgmStartInterval = gameUsecase.getFps() * 5;
     gameUsecase.setCurrentFrame(-bgmStartInterval);
