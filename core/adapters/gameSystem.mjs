@@ -385,6 +385,8 @@ function drawGameView() {
     }
 
     drawLane(Object.keys(keyBidns).length)
+
+    context.beginPath();
     context.fillStyle = "#777700";
     context.fillRect(0, 0, 640, 35);
     context.fillStyle = "#eeeeff";
@@ -478,6 +480,7 @@ function drawLane(numOfLane) {
         context.lineTo(ep.x, ep.y);
     });
     context.stroke();
+    context.beginPath();
 
     // ノーツを表示
     let notes = gameUsecase.getNotesWithin(lane_bottomTime, lane_topTime);
